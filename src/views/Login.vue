@@ -55,7 +55,8 @@
 import { ref, onMounted } from 'vue'
 import lottie from 'lottie-web'  
 import people from '../assets/iconfont/login.json'
-import { ElMessage } from 'element-plus'
+import { ElMessage } from 'element-plus';
+import { fetchLoginIn } from '../apis/modules/login';
 
 const animation1 = ref<any>(null);
 onMounted(() => {  
@@ -80,17 +81,28 @@ const userCount = ref('');
 const userPassword = ref('');
 const inputCount = ref(null);
 const inputPassword = ref(null);
-const handleLoginIn  = () => {
+const handleLoginIn  = async () => {
     if(userCount.value === '' || userPassword.value === '') {
         if(userCount.value === '') {
             ElMessage.error('用户账号不能为空');
             inputCount.value.focus();
+            return
         }else{
             ElMessage.error('用户密码不能为空');
             inputPassword.value.focus();
+            return 
         }
     }
-    // 登录逻辑
+    try {
+        const params = {
+            account: inputCount.value,
+            password:  inputPassword.value
+        }
+        const result = fetchLoginIn(params);
+        console.log('登录成功',result)
+    } catch (error) {
+        
+    }
 }
 
 //注册
