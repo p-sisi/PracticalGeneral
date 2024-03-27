@@ -1,0 +1,13 @@
+<template>
+    <div>
+        讨论
+    </div>
+</template>
+
+<script setup lang="ts">
+
+</script>
+
+<style scoped lang="scss">
+
+</style>
