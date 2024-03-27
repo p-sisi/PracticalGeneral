@@ -79,6 +79,34 @@
                 <div class="content-submit">
                     <el-button type="primary" round> &nbsp;&nbsp;提交作业&nbsp;&nbsp; </el-button>
                 </div>
+                <!-- 提交记录 -->
+                <div class="content-history">
+                    <div class="header">
+                        <el-icon><Clock /></el-icon>
+                        <div>提交记录</div>
+                    </div>
+                    <div class="list">
+                        <div class="times">提交次数：<span>{{ TASK_SUBMIT_RECORD.length }}</span></div>
+                        <el-timeline style="max-width: 700px">
+                            <el-timeline-item 
+                                v-for="item in TASK_SUBMIT_RECORD"
+                                :key="item.taskId"
+                                :timestamp=" item.submitTime " 
+                                placement="top">
+                                <div class="list-item">
+                                    <div class="list-item-info">
+                                        <span class="iconfont icon-wendangwenjian"></span>
+                                        <div>
+                                            <div>{{ item.fileName }}</div>
+                                            <div style="font-size: 12px;margin-top: 2px;">{{ item.fileSize }}</div>
+                                        </div>
+                                    </div>
+                                    <el-button plain>下载</el-button>
+                                </div>
+                            </el-timeline-item>
+                        </el-timeline>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -86,8 +114,9 @@
 
 <script setup lang="ts">
 import { computed, ref } from 'vue';
-import { TASK_DATA } from '../../content/student';
+import { TASK_DATA, TASK_SUBMIT_RECORD } from '../../content/student';
 import { ElMessage } from 'element-plus'
+import { Clock, Folder } from '@element-plus/icons-vue';
 
 //文件上传的后端接口地址
 const UPLOAD_URL = 'https://run.mocky.io/v3/9d059bf9-4660-45f2-925d-ce80ad6c4d15';
@@ -235,6 +264,49 @@ const handleErrorFile = (response:any, file:any, fileList:any) => {
                 display: flex;
                 justify-content: flex-end;
                 margin-right: 10px;
+            }
+            &-history {
+                .header {
+                    display: flex;
+                    align-items: center;
+                    gap: 4px;
+                }
+                .list {
+                    margin-top: 10px;
+                    padding: 6px 10px;
+                    width: 100%;
+                    border: 1px solid #dcdfe6;
+                    border-radius: 4px;
+                    background-color: #fff;
+                    box-sizing: border-box;
+                    .times {
+                        font-size: 14px;
+                        margin-bottom: 4px;
+                        span {
+                            font-size: 16px;
+                            font-weight: 600;
+                        }
+                    }
+                    .list-item {
+                        display: flex;
+                        justify-content: space-between;
+                        align-items: center;
+                        margin-top: 8px;
+                        &-info {
+                            display: flex;
+                            align-items: center;
+                            padding: 2px 8px;
+                            border: 1px solid #e1e3e5;
+                            border-radius: 4px; 
+                            width: 84%;
+                            .iconfont {
+                                margin-right: 8px;
+                                font-size: 36px;
+                                color: #409eff;
+                            }
+                        }
+                    }
+                }
             }
         }
     }

@@ -230,3 +230,19 @@ export const TASK_DATA = [
         isEnd: true,
     }
 ]
+
+//作业提交记录
+export const TASK_SUBMIT_RECORD = [
+    {
+        taskId: 1,
+        fileName: '实验一报告.docx',
+        fileSize: '1243.10kb',
+        submitTime: '2032-12-23 12:32'
+    },
+    {
+        taskId: 2,
+        fileName: '实验二报告.docx',
+        fileSize: '1243.10kb',
+        submitTime: '2032-12-23 12:32'
+    }
+]
