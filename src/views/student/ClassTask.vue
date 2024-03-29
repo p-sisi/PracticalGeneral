@@ -8,7 +8,7 @@
             </div>
             <div class="total">
                 <div>已发布&nbsp;{{ TASK_DATA.length }}</div>
-                <div style="margin-left: 8px;">未提交&nbsp;{{ subMitCount }}</div>
+                <div style="margin-left: 8px;">未提交<span style="color: #f56c6c;">&nbsp;{{ submitCount }}</span></div>
             </div>
         </div>
 
@@ -25,6 +25,7 @@
                 <div class="content">{{ item.content }}</div>
                 <div class="footer">
                     <div class="time">提交截止时间：{{ item.deadline }}</div>
+                    <div>已有&nbsp;{{item.submitCount}}&nbsp;人提交</div>
                     <div class="score" v-if="item.score !== 0">得分：<span style="font-size: 20px; color: #f56c6c;">{{ item.score }}</span></div>
                     <el-button type="primary" round v-if="item.isSubmit == false && item.isEnd == false">提交作业</el-button>
                     <el-button type="primary" round v-else-if="item.isSubmit == true" disabled>已提交</el-button>
@@ -121,7 +122,7 @@ import { Clock, Folder } from '@element-plus/icons-vue';
 //文件上传的后端接口地址
 const UPLOAD_URL = 'https://run.mocky.io/v3/9d059bf9-4660-45f2-925d-ce80ad6c4d15';
 
-const subMitCount = computed(() => {
+const submitCount = computed(() => {
     return TASK_DATA.filter(item => item.isSubmit === false).length;
 })
 
@@ -190,7 +191,7 @@ const handleErrorFile = (response:any, file:any, fileList:any) => {
                 justify-content: space-between;
                 align-items: center ;
                 margin-right: 18px;
-                font-size: 14px;
+                font-size: 13px;
                 color: #9c9a9a;
             }
         }

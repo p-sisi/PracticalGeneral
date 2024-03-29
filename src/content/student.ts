@@ -207,6 +207,7 @@ export const TASK_DATA = [
         title: '实验一实验报告',
         content: '提交实验一实验报告',
         deadline: '2023-11-24 12:59:59',     //截止日期
+        submitCount: 2,
         isSubmit: false,     //是否提交
         score: 0,     //得分   未打分则0，打分则为分数
         isEnd: false,     //是否截止
@@ -216,6 +217,7 @@ export const TASK_DATA = [
         title: '作业标题2',
         content: '作业内容2',
         deadline: '2023-11-24 12:59:59',
+        submitCount: 2,
         isSubmit: true,
         score: 90,
         isEnd: false,
@@ -225,6 +227,7 @@ export const TASK_DATA = [
         title: '作业标题3',
         content: '作业内容3',
         deadline: '2023-11-24 12:59:59',
+        submitCount: 2,
         isSubmit: false,
         score: 90,
         isEnd: true,
@@ -283,12 +286,14 @@ export const DISCUSS_REPLY_LIST_DATA = [
                 name: '杨思思',
                 time: '2021-21-32 12:12:12',
                 text: '庞思思真聪明+1',
+                replyName: '杨思远',   
             },
             {
                 id:2,
                 name: '杨远远',
                 time: '2000-13-12 12:12:12',
                 text: '庞思思真聪明+2',
+                replyName: '杨思思',
             }
         ]
     },
@@ -298,5 +303,47 @@ export const DISCUSS_REPLY_LIST_DATA = [
         time: '2021-21-32 12:12:12',
         text: '杨思远真垃圾',
         replyData: [],
+    }
+]
+
+
+//学生签到记录
+export const STUDENT_SIGN_IN_DATA = [
+    {
+        id:1,
+        title: '第一次签到',  //签到标题
+        type: '数字签到',    //签到类型  1 按钮签到   2 数字签到
+        createTime: '2020-12-31 12:12:12',   //签到发起时间
+        endTime: '2020-12-31 12:12:12',     //截止时间
+        signTime: '2020-12-31 12:12:12',    //签到时间
+        status: 4,   //签到状态   0 缺勤   1 出勤   2 迟到   3 请假  4 未签到
+        code: 1242   //签到码
+    },
+    {
+        id:2,
+        title: '第二次签到',
+        type: '按钮签到', 
+        createTime: '2020-12-31 12:12:12',
+        endTime: '2020-12-31 12:12:12',
+        signTime: '2020-12-31 12:12:12',
+        status:1,
+    },
+    {
+        id:3,
+        title: '第三次签到',
+        type: '数字签到', 
+        createTime: '2020-12-31 12:12:12',
+        endTime: '2020-12-31 12:12:12',
+        signTime: '2020-12-31 12:12:12',
+        status: 2,
+    },
+    {
+        id:4,
+        title: '第四次签到',
+        type: '数字签到', 
+        createTime: '2020-12-31 12:12:12',
+        endTime: '2020-12-31 12:12:12',
+        signTime: '2020-12-31 12:12:12',
+        status: 3,
     }
 ]

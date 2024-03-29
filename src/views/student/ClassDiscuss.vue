@@ -6,7 +6,7 @@
             <div style="display: flex;">
                 <div 
                     class="tab" 
-                    v-for="value in ['时间排序','热度优先']" 
+                    v-for="value in ['全部评论','时间排序','热度优先']" 
                     :class="{'isActive': activeTab === value}"
                      @click="changeTab(value)">{{ value }}</div>
                 <div style="font-size: 12px;margin: 4px 0px 0px 10px; ">共{{ DISCUSS_LIST_DATA.length }}个讨论</div>
@@ -117,7 +117,7 @@
                         </div>
                         <div class="reply-2">
                             <div class="reply-2-title" v-show="item.replyData.length !== 0 && isShoeReplyList == false" @click="isShoeReplyList = true">
-                                <span>---展开所有回复<el-icon><ArrowDown /></el-icon></span>
+                                <span>---展开&nbsp;{{ item.replyData.length}}&nbsp;条回复<el-icon><ArrowDown /></el-icon></span>
                             </div>
                             <div class="reply-2-list" v-for="list in item.replyData" :key="list.id" v-show="isShoeReplyList">
                                 <span>{{ list.name }}&nbsp;&nbsp;&nbsp;&nbsp;{{ list.time }}</span>
@@ -143,7 +143,7 @@ import { DISCUSS_LIST_DATA, DISCUSS_REPLY_LIST_DATA } from '../../content/studen
 
 const isShowDiscussDetail = ref(true);
 
-const activeTab = ref('时间排序');
+const activeTab = ref('全部评论');
 const changeTab = (label: any) => {
     if (activeTab.value === label )  return 
     activeTab.value = label;
