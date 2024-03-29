@@ -168,7 +168,7 @@ export const COURSE_MENU = [
         route: 'discuss'
     },
     {
-        label: '学情分析',
+        label: '成绩分析',
         name: 'analysis',
         route: 'analyze'
     },
