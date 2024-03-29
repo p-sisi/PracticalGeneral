@@ -17,20 +17,21 @@
             <div 
                 class="item"
                 v-for="item in TASK_DATA"
-                :key="item.taskId"
-                :class="{'hasEnd': item.isEnd == true,'hasSubmit': item.isSubmit == true}"
+                :key="item.id"
                 @click="goToTaskDetail(item)"
             >
                 <div class="title">{{ item.title}}</div>
                 <div class="content">{{ item.content }}</div>
                 <div class="footer">
-                    <div class="time">提交截止时间：{{ item.deadline }}</div>
-                    <div>已有&nbsp;{{item.submitCount}}&nbsp;人提交</div>
-                    <div class="score" v-if="item.score !== 0">得分：<span style="font-size: 20px; color: #f56c6c;">{{ item.score }}</span></div>
-                    <el-button type="primary" round v-if="item.isSubmit == false && item.isEnd == false">提交作业</el-button>
-                    <el-button type="primary" round v-else-if="item.isSubmit == true" disabled>已提交</el-button>
-                    <el-button type="info" round v-else="item.isEnd == true" disabled>已截止</el-button>
+                    <div class="time">提交截止时间：{{ item.deadTime }}</div>
+                    <div>已有&nbsp;{{item.commitNum}}&nbsp;人提交</div>
+                    <div class="score" v-if="item.commitStatus == 2">得分：<span style="font-size: 22px; color: #f56c6c;">{{ item.score }}</span></div>
+                    <el-button type="primary" round v-if="new Date(item.deadTime) > new Date() && item.commitStatus !== 2">{{item.commitStatus == 0 ? '提交作业' : '更新提交'}}</el-button>
+                    <el-button type="danger" round v-else-if="item.commitStatus == 0 && new Date(item.deadTime) < new Date()" disabled> 未提交 </el-button>
+                    <el-button type="info" round v-else-if="item.commitStatus == 1 && new Date(item.deadTime) < new Date() && item.commitStatus !== 2" disabled> 未批改 </el-button>
+                    <el-button type="info" round v-else disabled > 已批改 </el-button>
                 </div>
+                <div class="status hasEnd" v-if="new Date(item.deadTime) < new Date()">已截止</div>
             </div>
         </div>
 
@@ -46,12 +47,13 @@
                 </div>
                 <div class="title-right">
                     <div class="time">提交截止时间：{{ activeTaskData.deadline }}</div>
-                    <div class="status-noSubmit" v-if="activeTaskData.isSubmit == false && activeTaskData.isEnd ==false">未提交</div>
-                    <div class="status-submit" v-else-if="activeTaskData.isSubmit == true && activeTaskData.score == 0">已提交</div>
-                    <div class="status-score" v-else-if="activeTaskData.isSubmit == true && activeTaskData.score !== 0">{{ activeTaskData.score }}</div>
-                    <div class="status-end" v-if="activeTaskData.isEnd == true">已截止</div>
+                    <div class="status-noSubmit" v-if="activeTaskData.commitStatus == 0 && new Date(activeTaskData.deadTime) > new Date()">未提交</div>
+                    <div class="status-submit" v-else-if="activeTaskData.commitStatus == 1 && new Date(activeTaskData.deadTime) > new Date()">已提交</div>
+                    <div class="status-score" v-else-if="activeTaskData.commitStatus == 2">{{ activeTaskData.score }}</div>
+                    <div class="status-end" v-else>已截止</div>
                 </div>
             </div>
+
             <!-- 文件上传 -->
             <div class="content">
                 <div class="content-title">
@@ -78,8 +80,9 @@
                     /></div>
                 </div>
                 <div class="content-submit">
-                    <el-button type="primary" round> &nbsp;&nbsp;提交作业&nbsp;&nbsp; </el-button>
+                    <el-button type="primary" round :disabled="new Date(activeTaskData.deadTime) < new Date() || activeTaskData.commitStatus == 2"> &nbsp;&nbsp;{{ activeTaskData.commitStatus !== 0 ? '更新提交' : '提交作业'}}&nbsp;&nbsp; </el-button>
                 </div>
+
                 <!-- 提交记录 -->
                 <div class="content-history">
                     <div class="header">
@@ -173,6 +176,7 @@ const handleErrorFile = (response:any, file:any, fileList:any) => {
     }
     &-item {
         .item {
+            position: relative;
             padding: 10px;
             margin-bottom: 20px;
             border: 1px solid #e9e9e9;
@@ -194,12 +198,28 @@ const handleErrorFile = (response:any, file:any, fileList:any) => {
                 font-size: 13px;
                 color: #9c9a9a;
             }
-        }
-        .hasEnd {
-            color: #c8c9cc;
-        }
-        .hasSubmit {
-            background: linear-gradient(to bottom right, #edf4ff, #fff);
+            .status {
+                position: absolute;
+                font-size: 14px;
+                text-align: center;
+                margin-top: -112px;
+                padding: 4px 10px;
+                margin-left: 89%;
+                box-shadow: 0px 0px 6px rgba(0,0,0 ,0.2);
+                width: 60px;
+            }
+            .submit-ing {
+                color: #67c23a;
+                background-color: #ecf8e5;
+            }
+            .hasScore {
+                color: #fff;
+                background-color: #e6a23c91;
+            }
+            .hasEnd {
+                color: #fff;
+                background-color: #f56c6cc3;
+            }
         }
         .item:hover {
             box-shadow: 0px 0px 4px rgba(0,0,0 ,0.2);

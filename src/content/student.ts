@@ -203,34 +203,58 @@ export const COURSE_INFO = {
 //作业列表
 export const TASK_DATA = [
     {
-        taskId: 1,
+        id: 1,
         title: '实验一实验报告',
-        content: '提交实验一实验报告',
-        deadline: '2023-11-24 12:59:59',     //截止日期
-        submitCount: 2,
-        isSubmit: false,     //是否提交
+        content: '提交中，没提交',
+        deadTime: '2024-11-24 12:59:59',     //截止日期
+        commitNum: 2,
+        commitStatus: 0,     //提交状态   0：未提交 1：已提交  2：已批改 
         score: 0,     //得分   未打分则0，打分则为分数
-        isEnd: false,     //是否截止
     },
-    {
-        taskId: 2,
+    {//提交中，已提交，没批改
+        id: 2,
         title: '作业标题2',
-        content: '作业内容2',
-        deadline: '2023-11-24 12:59:59',
-        submitCount: 2,
-        isSubmit: true,
-        score: 90,
-        isEnd: false,
+        content: '提交中，已提交，没批改',
+        deadTime: '2024-11-24 12:59:59',
+        commitNum: 2,
+        commitStatus: 1,
+        score: 0,
     },
-    {
-        taskId: 3,
-        title: '作业标题3',
-        content: '作业内容3',
-        deadline: '2023-11-24 12:59:59',
-        submitCount: 2,
-        isSubmit: false,
+    {//提交中，已提交，已批改
+        id: 6,
+        title: '作业标题2',
+        content: '提交中，已提交，已批改',
+        deadTime: '2024-11-24 12:59:59',
+        commitNum: 2,
+        commitStatus: 2,
         score: 90,
-        isEnd: true,
+    },
+    {//已截止，已提交，已批改
+        id: 3,
+        title: '作业标题3',
+        content: '已截止，已提交，已批改',
+        deadTime: '2023-11-24 12:59:59',
+        commitNum: 2,
+        commitStatus: 2,
+        score: 90,
+    },
+    {//已截止，已提交，没批改
+        id: 4,
+        title: '作业标题4',
+        content: '已截止，已提交，没批改',
+        deadTime: '2023-11-24 12:59:59',
+        commitNum: 2,
+        commitStatus: 1,
+        score: 0,
+    },
+    {//已截止，没提交
+        id: 5,
+        title: '作业标题4',
+        content: '已截止，没提交',
+        deadTime: '2023-11-24 12:59:59',
+        commitNum: 2,
+        commitStatus: 0,
+        score: 0,
     }
 ]
 
