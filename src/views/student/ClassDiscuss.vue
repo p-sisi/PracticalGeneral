@@ -92,6 +92,8 @@
                 <!-- 回复列表 -->
                 <div class="reply-list">
                     <div class="item"  v-for="item in DISCUSS_REPLY_LIST_DATA " :key="item.id">
+
+                        <!-- 一级回复列表 -->
                         <div style="display: flex;width: 100%;">
                             <el-avatar> user </el-avatar>
                             <div style="margin-left: 10px;width: 100%;">
@@ -102,6 +104,8 @@
                                 <div class="reply-1">
                                     <div>{{ item.text }}</div>
                                     <span @click="handleReplyClick(item)">{{isShowReplyInput && activeReplyItemId == item.id ? '收起' : '回复'}}</span>
+                                    <!-- TODO：非自己的评论不展示删除入口 -->
+                                    <span @click="handleDeleteReply1(item)">删除</span>
                                 </div>
                                 <div  v-show="isShowReplyInput && activeReplyItemId == item.id" style="display: flex;align-items: flex-end;gap: 8px;">
                                     <el-input 
@@ -115,16 +119,40 @@
                                 </div>
                             </div>
                         </div>
+
                         <div class="reply-2">
                             <div class="reply-2-title" v-show="item.replyData.length !== 0 && isShoeReplyList == false" @click="isShoeReplyList = true">
                                 <span>---展开&nbsp;{{ item.replyData.length}}&nbsp;条回复<el-icon><ArrowDown /></el-icon></span>
                             </div>
+
+                            <!-- 二级回复列表 -->
                             <div class="reply-2-list" v-for="list in item.replyData" :key="list.id" v-show="isShoeReplyList">
-                                <span>{{ list.name }}&nbsp;&nbsp;&nbsp;&nbsp;{{ list.time }}</span>
-                                <div>{{ list.text }}</div>
+                                <div style="margin-top:4px;">
+                                    <el-avatar :size="26" >ser</el-avatar>
+                                </div>
+                                <div class="text">
+                                    <span>{{ list.name }}<span style="margin-left: 10px;font-size:10px;">回复&nbsp;{{list.replyName}}</span>&nbsp;&nbsp;&nbsp;&nbsp;{{ list.time }}</span>
+                                    <div style="display:flex;align-items: flex-end;gap:10px;">
+                                        <span class="text-text">{{ list.text }}</span>
+                                        <div class="text-reply" @click="handleReplyClick2(list,item)">{{isShowReplyInputList && activeReplyItemListId == list.id ? '收起' : '回复'}}</div>
+                                         <!-- TODO：非自己的评论不展示删除入口 -->
+                                        <span class="text-reply" @click="handleDeleteReply2(list,item)">删除</span>
+                                    </div>
+                                    <div v-show="isShowReplyInputList && activeReplyItemListId == list.id" style="display: flex;align-items: flex-end;gap: 8px;">
+                                        <el-input 
+                                            v-model="inputReplyText" 
+                                            style="width: 90%;margin-top: 8px;" 
+                                            :rows="1" 
+                                            type="textarea" 
+                                            placeholder="请输入" 
+                                            autosize/>
+                                        <el-button type="primary" :icon="Position" round size="small" @click="handleSendReply(list)"/>
+                                    </div>
+                                </div>
+                                
                             </div>
                             <div v-show="isShoeReplyList && item.replyData.length !== 0" @click="isShoeReplyList = false" class="reply-2-up">
-                                ----收起<el-icon><ArrowUp /></el-icon>
+                                -----收起<el-icon><ArrowUp /></el-icon>
                             </div>
                         </div>
                     </div>
@@ -205,22 +233,53 @@ const handleClickitem = (item: any) => {
 
 //回复评论
 const inputDiscussText = ref('');
-//耳机评论是否展示
+//二级评论是否展示
 const isShoeReplyList = ref(false);
 
 //一级回复
-const inputReplyText = ref('');
+const inputReplyText = ref('');  //回复输入内容
 const isShowReplyInput = ref(false);
 const activeReplyItemId = ref();
 
 const handleReplyClick = (item: any) => {
-    activeReplyItemId.value = item.id;
-    isShowReplyInput.value = !isShowReplyInput.value;
+    // 当前点击的一级回复id值和激活的id值相同则直接 ！  等于空是为了首次点击
+    if(activeReplyItemId.value == item.id || activeReplyItemId.value == null) {
+        isShowReplyInput.value = !isShowReplyInput.value;
+        activeReplyItemId.value = item.id
+        return;
+    }else {
+        isShowReplyInput.value = true;
+        activeReplyItemId.value = item.id;
+    }
+}
+
+const handleDeleteReply1 = (item: any) => {
+    //删除一级评论
 }
 
 const handleSendReply = (item: any) => {
     //发送回复
     console.log('回复内容',inputReplyText.value)
+}
+
+//二级评论
+const activeReplyItemListId = ref();
+const isShowReplyInputList = ref(false);
+
+const handleReplyClick2 = (list: any,item: any) => {
+    // list:二级回复 item:一级回复
+    if(activeReplyItemListId.value == list.id || activeReplyItemListId.value == null) {
+        isShowReplyInputList.value = !isShowReplyInputList.value;
+        activeReplyItemListId.value = list.id
+        return;
+    }else {
+        isShowReplyInputList.value = true;
+        activeReplyItemListId.value = list.id;
+    }
+}
+
+const handleDeleteReply2 = (list: any,item: any)  => {
+    //删除二级评论
 }
 </script>
 
@@ -345,13 +404,26 @@ const handleSendReply = (item: any) => {
                             }
                         }
                         .reply-2-list {
-                            margin-top: 8px;
-                            div {
-                                color: #213547;
-                                font-size: 13px;
-                                padding: 4px 8px;
-                                background-color: #fff;
-                                border-radius: 4px;
+                            display: flex;
+                            gap: 8px;
+                            margin-top: 10px;
+                            width: 100%;
+                            .text {
+                                width: 100%;
+                                .text-text {
+                                    width: 86%;
+                                    color: #213547;
+                                    font-size: 12px;
+                                    padding: 4px 8px;
+                                    background-color: #fff;
+                                    border-radius: 4px;
+                                }
+                                .text-reply {
+                                    cursor: pointer;
+                                }
+                                .text-reply:hover {
+                                    color: #4186ff;
+                                }
                             }
                         }
                         
@@ -371,7 +443,7 @@ const handleSendReply = (item: any) => {
                     margin-top: 4px;
                     gap: 8px;
                     div {
-                        width: 90%;
+                        width: 86%;
                         padding: 4px 8px;
                         font-size: 15px;
                         background-color: #fff;
