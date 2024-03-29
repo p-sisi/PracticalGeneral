@@ -95,13 +95,13 @@ const handleLoginIn  = async () => {
     }
     try {
         const params = {
-            account: inputCount.value,
-            password:  inputPassword.value
+            account: userCount.value,
+            password: userPassword.value
         }
-        const result = fetchLoginIn(params);
+        const result = await fetchLoginIn(params);
         console.log('登录成功',result)
     } catch (error) {
-        
+        console.log('登录失败',error)
     }
 }
 

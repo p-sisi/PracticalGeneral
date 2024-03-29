@@ -246,3 +246,57 @@ export const TASK_SUBMIT_RECORD = [
         submitTime: '2032-12-23 12:32'
     }
 ]
+
+//讨论话题列表
+export const DISCUSS_LIST_DATA = [
+    {
+        id: 1,
+        title: '讨论标题1',
+        publisher:'杨思远',
+        content: '1111',
+        viewCount: 12,
+        replyCount: 10,
+        createTime:'2022-31-42 12:12:12'
+    },
+    {
+        id: 1,
+        title: '讨论标题1',
+        publisher:'杨思远',
+        content: '1111',
+        viewCount: 12,
+        replyCount: 10,
+        createTime:'2022-31-42 12:12:12'
+    },
+]
+
+
+//讨论回复列表
+export const DISCUSS_REPLY_LIST_DATA = [
+    {
+        id: 1,
+        name: '杨思远',
+        time: '2031-21-12 21:31:21',
+        text: '庞思思真聪明！',
+        replyData: [
+            {
+                id: 1,
+                name: '杨思思',
+                time: '2021-21-32 12:12:12',
+                text: '庞思思真聪明+1',
+            },
+            {
+                id:2,
+                name: '杨远远',
+                time: '2000-13-12 12:12:12',
+                text: '庞思思真聪明+2',
+            }
+        ]
+    },
+    {
+        id: 2,
+        name: '庞思思',
+        time: '2021-21-32 12:12:12',
+        text: '杨思远真垃圾',
+        replyData: [],
+    }
+]

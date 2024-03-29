@@ -8,12 +8,13 @@ import { ElementPlusResolver } from 'unplugin-vue-components/resolvers';
 export default defineConfig(() => {
   return {
     server: {
+      host: '0.0.0.0',
       port: 1023,
       open: true,
       proxy: {
           //正则表达式，所有以/collect|/sysDialog|/user开头的请求地址都使用target的域名，如果还有其他域名，则在下面以一样的格式补充
-          '^(/collect|/sysDialog|/user)': {
-              target: '10.33.9.29:8081/',    //请求域名
+          '^(/user)': {
+              target: 'http://10.33.9.29:8081/',    //请求域名
               changeOrigin: true,
           }
       }
