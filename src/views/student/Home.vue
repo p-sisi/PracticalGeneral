@@ -16,13 +16,13 @@
                 <div class="tabList"
                     v-for="value in ['我的课程','公告栏']"
                     @click="tabChange(value)" 
-                    :class="{ 'selectedTab': value === activeTab }">{{ value }}</div>
+                    :class="{ 'selectedTab': value === studentStore.activeHomeTab }">{{ value }}</div>
             </div>
         </el-affix>
 
         <div class="container-body">
             <!-- 课程列表 -->
-            <div class="class-list" v-show="activeTab == '我的课程'">
+            <div class="class-list" v-show="studentStore.activeHomeTab == '我的课程'">
                 <div style="display: flex;justify-content: space-between;">
                     <div class="title">
                         <div> 课程状态</div>
@@ -63,7 +63,7 @@
             </div>
 
             <!-- 公告 -->
-            <div class="notice" v-show="activeTab == '公告栏'">
+            <div class="notice" v-show="studentStore.activeHomeTab == '公告栏'">
                 <!-- 公告类型 -->
                 <div class="notice-type">
                     <div class="type-container">
@@ -128,11 +128,10 @@ const studentStore = useStudentStore()
 
 const addClassNumber = ref('');
 
-const activeTab = ref('我的课程');
 const tabChange = (label: any) => {
     //当重复点击时，取消选中
-    if (activeTab.value === label )  return 
-    activeTab.value = label;
+    if (studentStore.activeHomeTab === label )  return 
+    studentStore.setActiveHomeTab(label);
 }
 
 //点击课程item

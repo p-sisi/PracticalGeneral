@@ -24,7 +24,7 @@
 
                 <!-- 右边 -->
                 <div class="header-right">
-                    <div style="cursor: pointer;">
+                    <div style="cursor: pointer;" @click="studentStore.setActiveHomeTab('公告栏')">
                         <span class="iconfont icon-gonggao"></span>
                         <span style="margin-left: 2px;">公告</span>
                     </div>
@@ -41,7 +41,7 @@
                             </div>
                             <template #dropdown>
                                 <el-dropdown-menu>
-                                    <el-dropdown-item @click="handleClickClass">我的课程</el-dropdown-item>
+                                    <el-dropdown-item @click="studentStore.setActiveHomeTab('我的课程')">我的课程</el-dropdown-item>
                                     <el-dropdown-item @click="handleChangePassword">修改密码</el-dropdown-item>
                                     <el-dropdown-item divided @click="handleLoginOut">退出登录</el-dropdown-item>
                                 </el-dropdown-menu>
@@ -81,13 +81,8 @@ const radioChange = (item:any) => {
         // window.location.reload();
     }else {
         router.push({name: 'resource'});
-        // window.location.reload();
     }
     studentStore.setActiveMenu(item);
-}
-
-const handleClickClass = () => {
-    //我的课程跳转
 }
 
 //修改密码

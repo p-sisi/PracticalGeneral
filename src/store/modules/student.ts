@@ -4,6 +4,7 @@ export interface StudentState{
     menuList: Array<any>;    //头部菜单列表
     userName: string;    //学生姓名
     activeMenu: string;  //当前头部激活的菜单
+    activeHomeTab: string;   //当前首页激活tab ：课程、公告
     activeClass: object;  //当前选中的课程---课程详情
     activeClassMenu: string;  //当前激活的菜单---课程详情
 }
@@ -22,7 +23,8 @@ export const useStudentStore = defineStore("student",{
             status: 1,     //课程状态 0 已结束  1 进行中
         },
         activeClassMenu: '课程资源',
-        activeMenu: '首页'
+        activeMenu: '首页',
+        activeHomeTab: '我的课程'
     }),
     getters:{
     },
@@ -41,6 +43,9 @@ export const useStudentStore = defineStore("student",{
         },
         setActiveMenu(newMenu: string) {
             this.activeMenu = newMenu;
+        },
+        setActiveHomeTab(newTab: string) {
+            this.activeHomeTab = newTab;
         }
     },
     persist: [
