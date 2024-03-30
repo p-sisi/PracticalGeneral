@@ -1,6 +1,6 @@
 <template>
     <div>
-        课程资源，有视频资源、文档报告
+        头部
     </div>
 </template>
 

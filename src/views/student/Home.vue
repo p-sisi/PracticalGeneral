@@ -46,6 +46,7 @@
                         class="list-item"
                         v-for="item in CLASS_LIST_DATA"
                         :key="item.classId"
+                        @click="handleClickClass(item)"
                         >
                         <div class="name">{{ item.className }}</div>
                         <el-image style="width: 100%; height: 180px" :src="item.imgUrl" fit="fit" />
@@ -120,6 +121,10 @@
 import { ref } from 'vue';
 import { Right, Search, Loading } from '@element-plus/icons-vue'
 import { CLASS_STATUS, CLASS_LIST_DATA, NOTICE_LIST_DATA } from '../../content/student'
+import { useStudentStore } from '@/store'
+import router from '@/router/index.ts';
+
+const studentStore = useStudentStore()
 
 const addClassNumber = ref('');
 
@@ -128,6 +133,19 @@ const tabChange = (label: any) => {
     //当重复点击时，取消选中
     if (activeTab.value === label )  return 
     activeTab.value = label;
+}
+
+//点击课程item
+const handleClickClass = (item:any) => {
+    studentStore.setActiveClass(item);
+
+    if(!studentStore.menuList.includes(item.className)) {
+        studentStore.addMenuList(item.className);
+    }
+        
+    studentStore.setActiveMenu(item.className);
+
+    router.push({ name: 'resource'})
 }
 
 //切换课程状态

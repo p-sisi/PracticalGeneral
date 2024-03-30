@@ -23,10 +23,8 @@
                     <!-- 管理台左边菜单子路由出口 -->
                     <router-view></router-view>
                 </div>
-            </el-scrollbar>
-           
-        </div>
-        
+            </el-scrollbar>  
+        </div>   
     </div>
 </template>
 

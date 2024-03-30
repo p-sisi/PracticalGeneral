@@ -113,7 +113,14 @@ const routes = [
     {
         name: 'teacher',   
         path: '/teacher',  
-        component: () => import('../views/teacher/Index.vue')  
+        component: () => import('../views/teacher/Index.vue') ,
+        children: [
+            {
+              path: 'index',
+              name: 'teacher-index',
+              component: () => import('../views/student/Home.vue'),
+            },
+        ]
     },
     {
         path: '/',

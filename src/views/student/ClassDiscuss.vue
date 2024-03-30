@@ -169,7 +169,7 @@ import { Search, Plus, ArrowLeftBold, ArrowDown, ArrowUp, Position } from '@elem
 import type { FormRules, FormInstance } from 'element-plus'
 import { DISCUSS_LIST_DATA, DISCUSS_REPLY_LIST_DATA } from '../../content/student'
 
-const isShowDiscussDetail = ref(true);
+const isShowDiscussDetail = ref(false);
 
 const activeTab = ref('全部评论');
 const changeTab = (label: any) => {

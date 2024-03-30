@@ -3,13 +3,14 @@ import { defineStore } from 'pinia'
 export interface StudentState{
     menuList: Array<any>;    //头部菜单列表
     userName: string;    //学生姓名
+    activeMenu: string;  //当前头部激活的菜单
     activeClass: object;  //当前选中的课程---课程详情
     activeClassMenu: string;  //当前激活的菜单---课程详情
 }
 
 export const useStudentStore = defineStore("student",{
     state: (): StudentState => ({
-        menuList: ['首页','计算机课'],
+        menuList: ['首页'],
         userName: '杨思远',
         activeClass: {
             classId: 2,       //课程id
@@ -21,6 +22,7 @@ export const useStudentStore = defineStore("student",{
             status: 1,     //课程状态 0 已结束  1 进行中
         },
         activeClassMenu: '课程资源',
+        activeMenu: '首页'
     }),
     getters:{
     },
@@ -36,6 +38,9 @@ export const useStudentStore = defineStore("student",{
         },
         setActiveClassMenu(newActiveClassMenu: string) {
             this.activeClassMenu = newActiveClassMenu;
+        },
+        setActiveMenu(newMenu: string) {
+            this.activeMenu = newMenu;
         }
     },
     persist: [

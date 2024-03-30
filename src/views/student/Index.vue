@@ -5,7 +5,7 @@
                 <!-- 左边 -->
                 <div class="header-left">
                     <span class="iconfont icon-shuben-book3"></span>
-                    <div>实训管理系统</div>
+                    <div>实训管理系统（学生端）</div>
                 </div>
 
                 <!-- 中间菜单头 -->
@@ -14,9 +14,11 @@
                         v-for="item in studentStore.menuList"   
                         @click="radioChange(item)" 
                         class="tabs-temp" 
-                        :class="{ 'selected': item === activeTMenu }"
+                        :class="{ 'selected': item === studentStore.activeMenu }"
                     >
-                        <span>{{ item }}</span>
+                        <el-tooltip :content="item" placement="bottom" effect="light">
+                            <span>{{ item }}</span>
+                        </el-tooltip>
                     </div>
                 </div>
 
@@ -65,17 +67,23 @@
 
 <script setup lang="ts">
 import { ref } from 'vue';
-import { CirclePlus, UserFilled, ArrowDown } from '@element-plus/icons-vue';
+import { CirclePlus, UserFilled, ArrowDown, Close } from '@element-plus/icons-vue';
 import { useStudentStore } from '@/store'
 import router from '../../router';
 
 const studentStore = useStudentStore()
 
 // 菜单切换
-const activeTMenu = ref('首页') 
 const radioChange = (item:any) => {
-    if (activeTMenu.value === item )  return 
-    activeTMenu.value = item;
+    if (studentStore.activeMenu === item )  return 
+    if (item == '首页') {
+        router.push({name: 'student-home'});
+        // window.location.reload();
+    }else {
+        router.push({name: 'resource'});
+        // window.location.reload();
+    }
+    studentStore.setActiveMenu(item);
 }
 
 const handleClickClass = () => {
@@ -101,11 +109,11 @@ const handleLoginOut = () => {
     flex-flow: row nowrap;
     align-items: center;
     color: #fff;
-    margin-left: -400px;
     .tabs-temp {   
-        max-width: 50px;
+        max-width: 70px;
         height: 30px;
         margin-right: 20px;
+        padding: 4px 0px;
         font-size: 12px;
         line-height: 32px;
         white-space: nowrap;
