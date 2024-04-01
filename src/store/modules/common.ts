@@ -1,6 +1,13 @@
 import { defineStore } from 'pinia';
 import { USER_TYPE } from '../../content/common'
 
+//用户信息接口
+export interface userInfo {
+    headImg: string;   //头像
+    name: string;     //姓名
+    userId: number;  //用户id
+    userType: number;  //用户类型
+}
 export interface CommonState{
     userType: string;   //用户类型    0 管理员 1教师 2学生
     userInfo: object;   //用户信息
@@ -9,7 +16,7 @@ export interface CommonState{
 export const useCommonStore = defineStore("common",{
     state: (): CommonState => ({
         userType: '',
-        userInfo: {},
+        userInfo: {} as UserInfo,
     }),
     getters:{
     },

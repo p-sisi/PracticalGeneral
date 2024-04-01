@@ -8,3 +8,10 @@ import request from '../request';
 export function fetchLoginIn(params: any) {
     return request.post('/user/login', params);
 }
+
+/**
+ * 是否登录
+ */
+export function fetchIsLoginIn(params: any) {
+    return request.get('/user/isLogin', params);
+}

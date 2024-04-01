@@ -74,71 +74,6 @@ export const CLASS_LIST_DATA = [
     }
 ]
 
-//公告列表
-export const NOTICE_LIST_DATA = [
-    {
-        noticeId: 1,
-        courseId: 0,
-        noticeType: 'system',    //system:系统公告  course: 课程公告
-        title: '公告标题1',
-        content: '公告内容1公告内容1公告内容1公告内容1公告内容1公告内容1公告内容1公告内容1公告内容1公告内容1公告内容1公告内容1公告内容1公告内容1公告内容1公告内容1公告内容1公告内容1公告内容1公告内容1公告内容1公告内容1公告内容1公告内容1公告内容1公告内容1公告内容1公告内容1',
-        createTime: '2022-01-01 00:00:00',   //公告首次发布时间
-        updateTime: '2022-01-01 00:00:00',   //公告最后一次更新时间
-        resource: '系统',  //公告来源，系统 or 具体课程
-        publisher: '杨思远',   //公告发布者
-        status: 0,    //公告状态： 0 未读   1 已读
-        isTop: false,   //是否置顶
-    },
-    {
-        noticeId: 2,
-        courseId: 0,
-        noticeType: 'course',
-        title: '公告标题2',
-        content: '公告内容2公告内容2公告内容2公告内容2公告内容2公告内容2公告内容2公告内容2公告内容2公告内容2公告内容2公告内容2',
-        createTime: '2022-01-01 00:00:00',
-        updateTime: '2022-01-01 00:00:00',
-        resource: '计算机系统',
-        publisher: '杨思远',
-        status: 1,
-    },
-    {
-        noticeId: 3,
-        courseId: 0,
-        noticeType: 'system',
-        title: '公告标题3',
-        content: '公告内容3公告内容3公告内容3公告内容3公告内容3公告内容3公告内容3公告内容3公告内容3公告内容3公告内容3公告内容3公告内容3公告内容3公告内容3',
-        createTime: '2022-01-01 00:00:00',
-        updateTime: '2022-01-01 00:00:00',
-        resource: '系统',
-        publisher: '杨思远',
-        status: 0,
-    },
-    {
-        noticeId: 4,
-        courseId: 0,
-        noticeType: 'system',
-        title: '公告标题4',
-        content: '公告内容4公告内容4公告内容4公告内容4公告内容4公告内容4公告内容4公告内容4公告内容4公告内容4公告内容4公告内容4公告内容4公告内容4',
-        createTime: '2022-01-01 00:00:00',
-        updateTime: '2022-01-01 00:00:00',
-        resource: '系统',
-        publisher: '杨思远',
-        status: 1,
-    },
-    {
-        noticeId: 5,
-        courseId: 0,
-        noticeType: 'system',
-        title: '公告标题5',
-        content: '公告内容5',
-        createTime: '2022-01-01 00:00:00',
-        updateTime: '2022-01-01 00:00:00',
-        resource: '系统',
-        publisher: '杨思远',
-        status: 0,
-    }
-]
-
 
 //课程详情页菜单
 export const COURSE_MENU = [
@@ -370,3 +305,18 @@ export const STUDENT_SIGN_IN_DATA = [
         status: 3,
     }
 ]
+
+//公告详情信息
+export interface Notice {
+    noticeId: number;   
+    courseId: number;
+    content: string;       //内容
+    createTime: string;    //发布时间
+    updateTime: string;    //更新时间
+    creatorName: string;   //发布者名称
+    isRead: false;         //是否已读
+    isTop: true;          //是否置顶
+    noticeType: number;   //课程类型： 0 系统公告 1 课程公告
+    courseName: string;   //公告来源课程名称
+    title: string;        //标题
+}

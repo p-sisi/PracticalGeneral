@@ -94,23 +94,24 @@
                 <div class="notice-item">
                     <div 
                         class="item"
-                        v-for="item in NOTICE_LIST_DATA"
-                        :class="{ 'read': item.status === 1, 'unread': item.status === 0 }"
+                        v-for="item in courseNoticeData"
+                        :class="{ 'read': item.isRead , 'unread': item.isRead }"
                         @click="noticeItemClick(item)"
                         >
                         <div class="item-title">
                             <div>{{ item.title }}</div>
-                            <span style="color:#ccc;font-size: 14px;" v-if="item.status === 1">已读</span>
+                            <span style="color:#ccc;font-size: 14px;" v-if="item.isRead">已读</span>
                             <span style="color: #4186ff;cursor: pointer;font-size: 14px;" v-else @click="handleRead(item)">标为已读</span>
                         </div>
                         <div class="item-content">{{item.content}}</div>
                         <div class="item-footer">
-                            <div>来源：{{ item.resource }}</div>
+                            <div>来源：{{ item.noticeType == 0 ? '系统' : item.courseName }}</div>
                             <div>发布：{{ item.createTime }}</div>
                             <div>最近一次更新：{{item.updateTime}}</div>
-                            <div>发布者：{{ item.publisher }}</div>
+                            <div>发布者：{{ item.creatorName }}</div>
                         </div>
                     </div>
+                    <div class="refresh-mask" v-if="isRefreshing"></div>
                 </div>
             </div>
         </div>
@@ -118,20 +119,36 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, onMounted, Ref } from 'vue';
 import { Right, Search, Loading } from '@element-plus/icons-vue'
-import { CLASS_STATUS, CLASS_LIST_DATA, NOTICE_LIST_DATA } from '../../content/student'
+import { CLASS_STATUS, CLASS_LIST_DATA, Notice } from '../../content/student'
 import { useStudentStore } from '@/store'
 import router from '@/router/index.ts';
+import { fetchGetAllCourseNotice, fetchGetAllSysNotice } from '../../apis/modules/notice';
 
 const studentStore = useStudentStore()
 
-const addClassNumber = ref('');
+onMounted(() => {
+    getNoticeListRequest('系统公告');
+})
+
+const isRefreshing = ref(false);   //刷新遮罩层
 
 const tabChange = (label: any) => {
-    //当重复点击时，取消选中
     if (studentStore.activeHomeTab === label )  return 
     studentStore.setActiveHomeTab(label);
+}
+
+//课程
+const addClassNumber = ref('');
+
+const getClassListRequest = async () => {
+    try {
+        //TODO：获取课程列表请求
+
+    } catch (error) {
+        
+    }
 }
 
 //点击课程item
@@ -144,6 +161,7 @@ const handleClickClass = (item:any) => {
         
     studentStore.setActiveMenu(item.className);
 
+    //TODO:跳转课程详情，路由添加参数：课程id
     router.push({ name: 'resource'})
 }
 
@@ -157,12 +175,33 @@ const classStatusChange = (label: any) => {
 
 const searchClassValue = ref('');
 
+//公告
+const courseNoticeData: Ref<Notice[]> = ref([]);   //公告列表
 
-// 公告
-const activeNoticeType = ref('系统公告') //默认选中
+const getNoticeListRequest = async(type: string) => {
+    try {
+        isRefreshing.value = true;
+        let result = null;
+        if(type == '系统公告') {
+            result = await fetchGetAllSysNotice();
+        }else {
+            result = await fetchGetAllCourseNotice();
+        }
+        courseNoticeData.value = result.data;
+        isRefreshLoading.value = false;
+        isRefreshing.value = false;
+    } catch (error) {
+        console.log('获取公告失败', error);
+    }
+}
+
+// 切换公告类型
+const activeNoticeType = ref('系统公告') 
 const noticeTypeChange = (label: any) => {
     if (activeNoticeType.value === label )  return 
     activeNoticeType.value = label;
+
+    getNoticeListRequest(activeNoticeType.value);
 }
 
 const noticeItemClick = (item: any) => {
@@ -177,17 +216,16 @@ const handleRead = (item: any) => {
 
 
 const handleAllRead = () => {
-    
+    //TODO:全部公告标为已读，考虑与单个公告合并方法
 }
 
 //刷新公告
 const isRefreshLoading = ref(false);
 const handleRefresh = () => {
     if(isRefreshLoading.value == true) return
-    //TODO:刷新，重新请求公告
 
-    //刷新结束
     isRefreshLoading.value = true;
+    getNoticeListRequest(activeNoticeType.value);
 } 
 </script>
 
@@ -358,6 +396,7 @@ const handleRefresh = () => {
                 }
             }
             &-item {
+                position: relative;
                 width: 80%;
                 margin: 18px;
                 .item {
@@ -393,6 +432,39 @@ const handleRefresh = () => {
                         color: #c1c1c1;
                     }
                 }
+                // 遮罩层效果
+                .refresh-mask {
+                    position: absolute;
+                    top: 0;
+                    left: 0;
+                    width: 100%;
+                    height: 100%;
+                    background-color: rgba(255, 255, 255, 0.8); /* 使用半透明的白色作为背景 */
+                    z-index: 9999; /* 确保遮罩在最上层 */
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    }
+
+                    .refresh-mask::before {
+                    content: "";
+                    display: inline-block;
+                    width: 40px;
+                    height: 40px;
+                    border: 4px solid #ccc;
+                    border-top-color: #333;
+                    border-radius: 50%;
+                    animation: spin 1s linear infinite; /* 添加旋转动画效果 */
+                    }
+
+                    @keyframes spin {
+                    0% {
+                        transform: rotate(0deg);
+                    }
+                    100% {
+                        transform: rotate(360deg);
+                    }
+                    }
             }
         }
     }

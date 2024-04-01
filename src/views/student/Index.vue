@@ -5,7 +5,8 @@
                 <!-- 左边 -->
                 <div class="header-left">
                     <span class="iconfont icon-shuben-book3"></span>
-                    <div>实训管理系统（学生端）</div>
+                    <div v-show="commonStore.userType == '学生'">实训管理系统（学生端）</div>
+                    <div v-show="commonStore.userType == '教师'">实训管理系统（教师端）</div>
                 </div>
 
                 <!-- 中间菜单头 -->
@@ -25,16 +26,17 @@
                 <!-- 右边 -->
                 <div class="header-right">
                     <div style="cursor: pointer;" @click="studentStore.setActiveHomeTab('公告栏')">
-                        <span class="iconfont icon-gonggao"></span>
+                        <span class="iconfont icon-xiaoxi"></span>
                         <span style="margin-left: 2px;">公告</span>
                     </div>
-                    <div class="header-right-add">
+                    <div class="header-right-add" v-show="commonStore.userType == '学生'">
                         <el-icon><CirclePlus /></el-icon>
                         <div>加入课程</div>
                     </div>
                     <div class="header-right-user">
                         <el-avatar :icon="UserFilled" size="small"> </el-avatar>
-                        <div >{{ studentStore.userName }}</div>
+                        <div v-if="commonStore.userType == '学生'">学生：{{ commonStore.userInfo.name }}</div>
+                        <div v-else>教师：{{ commonStore.userInfo.name }}</div>
                         <el-dropdown>
                             <div style="color: #fff;">
                                 <el-icon><arrow-down /></el-icon>
@@ -68,10 +70,11 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import { CirclePlus, UserFilled, ArrowDown, Close } from '@element-plus/icons-vue';
-import { useStudentStore } from '@/store'
+import { useStudentStore, useCommonStore } from '@/store'
 import router from '../../router';
 
-const studentStore = useStudentStore()
+const studentStore = useStudentStore();
+const commonStore = useCommonStore();
 
 // 菜单切换
 const radioChange = (item:any) => {
