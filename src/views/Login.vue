@@ -45,7 +45,13 @@
                 <div class="tips">教师账号请联系管理员创建哦</div>
             </div>
 
-            <div class="login-btn" @click="handleLoginIn" v-if="currentStatus == '登录'">登 录 </div>
+            <div class="login-btn" @click="handleLoginIn" v-if="currentStatus == '登录'">
+                <el-icon class="is-loading" v-show="isLogin" style="margin-right: 10px;">
+                    <Loading />
+                </el-icon>
+                <span v-if="!isLogin">登 录</span>
+                <span v-else>正在登录中</span>
+            </div>
             <div class="login-btn sign" @click="handleSignUp" v-if="currentStatus == '注册'">注 册 </div>
         </div>  
     </div>
@@ -56,7 +62,12 @@ import { ref, onMounted } from 'vue'
 import lottie from 'lottie-web'  
 import people from '../assets/iconfont/login.json'
 import { ElMessage } from 'element-plus';
+import { Loading } from '@element-plus/icons-vue';
 import { fetchLoginIn } from '../apis/modules/login';
+import { useCommonStore } from '@/store';
+import router from '../router';
+
+const commonStore = useCommonStore();
 
 const animation1 = ref<any>(null);
 onMounted(() => {  
@@ -81,6 +92,14 @@ const userCount = ref('');
 const userPassword = ref('');
 const inputCount = ref(null);
 const inputPassword = ref(null);
+const isLogin = ref(false);
+
+/**
+ * 1、发送登录请求
+ * 2、保存用户信息
+ * 3、保存身份验证token
+ * 4、路由跳转对应端
+ */
 const handleLoginIn  = async () => {
     if(userCount.value === '' || userPassword.value === '') {
         if(userCount.value === '') {
@@ -94,14 +113,30 @@ const handleLoginIn  = async () => {
         }
     }
     try {
+        isLogin.value = true;
+
         const params = {
             account: userCount.value,
             password: userPassword.value
         }
         const result = await fetchLoginIn(params);
-        console.log('登录成功',result)
+        commonStore.setUserType(result.data.userInfo.userType);
+        commonStore.setUserInfo(result.data.userInfo);
+        localStorage.setItem('Token', result.data.token);
+
+
+        isLogin.value = false;
+        ElMessage.success('登录成功！');
+        if(commonStore.userType == '管理员') {
+            router.push({name:'admin-home'});
+        }else if(commonStore.userType == '教师') {
+            router.push({name:'teacher-index'});
+        }else {
+            router.push({name:'student-home'});
+        }
     } catch (error) {
-        console.log('登录失败',error)
+        ElMessage.error('登录失败！');
+        isLogin.value = false;
     }
 }
 

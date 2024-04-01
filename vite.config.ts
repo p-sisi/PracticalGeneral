@@ -14,7 +14,7 @@ export default defineConfig(() => {
       proxy: {
           //正则表达式，所有以/collect|/sysDialog|/user开头的请求地址都使用target的域名，如果还有其他域名，则在下面以一样的格式补充
           '^(/user)': {
-              target: 'http://10.33.9.29:8081/',    //请求域名
+              target: 'http://10.33.85.72:8081/',    //请求域名
               changeOrigin: true,
           }
       }

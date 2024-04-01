@@ -3,6 +3,7 @@ import { createRouter,createWebHashHistory } from "vue-router";
 
 const routes = [
     {
+        // 管理员路由
         name: 'admin',   
         path: '/admin',  
         component: () => import('../views/admin/Index.vue'),
@@ -45,6 +46,7 @@ const routes = [
         component: () => import('../views/Login.vue')  
     },
     {
+        // 学生路由
         name: 'student',   
         path: '/student',  
         component: () => import('../views/student/Index.vue'),
@@ -60,6 +62,7 @@ const routes = [
                 component: () => import('../views/student/ClassDetail.vue'),
                 children: [
                     {
+                        // 课程详情页路由
                         path: 'resource',
                         name: 'resource',
                         component: () => import('../views/student/ClassResource.vue'),
@@ -107,10 +110,10 @@ const routes = [
                     
                 ]
             },
-
         ] 
     }, 
     {
+        // 教师路由
         name: 'teacher',   
         path: '/teacher',  
         component: () => import('../views/teacher/Index.vue') ,
@@ -118,7 +121,61 @@ const routes = [
             {
               path: 'index',
               name: 'teacher-index',
-              component: () => import('../views/student/Home.vue'),
+              component: () => import('../views/teacher/Home.vue'),
+            },
+            {
+                path: 'class_detail',
+                name: 'teacher_class_detail',
+                component: () => import('../views/teacher/ClassDetail.vue'),
+                children: [
+                    {
+                        // 课程详情页路由
+                        path: 'resource',
+                        name: 'teacher_resource',
+                        component: () => import('../views/teacher/DetailResource.vue'),
+                    },
+                    {
+                        path: 'notice',
+                        name: 'notice',
+                        component: () => import('../views/student/ClassNotice.vue'),
+                    },
+                    {
+                        path: 'task',
+                        name: 'task',
+                        component: () => import('../views/student/ClassTask.vue'),
+                    },
+                    {
+                        path: 'discuss',
+                        name: 'discuss',
+                        component: () => import('../views/student/ClassDiscuss.vue'),
+                    },
+                    {
+                        path: 'analyze',
+                        name: 'analyze',
+                        component: () => import('../views/student/ClassAnalyze.vue'),
+                    },
+                    {
+                        path: 'check_in',
+                        name: 'check_in',
+                        component: () => import('../views/student/ClassCheckIn.vue'),
+                    },
+                    {
+                        path: 'reply',
+                        name: 'reply',
+                        component: () => import('../views/student/ClassReply.vue'),
+                    },
+                    {
+                        path: 'member',
+                        name: 'member',
+                        component: () => import('../views/student/ClassMember.vue'),
+                    },
+                    {
+                        path: 'survey',
+                        name: 'survey',
+                        component: () => import('../views/student/ClassSurvey.vue'),
+                    },
+                    
+                ]
             },
         ]
     },

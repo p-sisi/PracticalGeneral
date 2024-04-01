@@ -11,12 +11,11 @@
                 <!-- 中间菜单头 -->
                 <div class="tabs-change">
                     <div 
-                        v-for="item in studentStore.menuList"   
+                        v-for="item in teacherStore.homeHeaderMenuList"   
                         @click="radioChange(item)" 
                         class="tabs-temp" 
-                        :class="{ 'selected': item === activeTMenu }"
+                        :class="{ 'selected': item === teacherStore.activeHomeHeaderMenu }"
                     >
-                    <!-- TODO：根据当前激活的课程名称来添加，点击课程列表的时候 -->
                         <span>{{ item }}</span>
                     </div>
                 </div>
@@ -29,14 +28,13 @@
                     </div>
                     <div class="header-right-user">
                         <el-avatar :icon="UserFilled" size="small"> </el-avatar>
-                        <div>教师：{{ studentStore.userName }}</div>
+                        <div>教师：{{ teacherStore.teacherInfo.name }}</div>
                         <el-dropdown>
                             <div style="color: #fff;">
                                 <el-icon><arrow-down /></el-icon>
                             </div>
                             <template #dropdown>
                                 <el-dropdown-menu>
-                                    <el-dropdown-item @click="handleClickClass">教学课程</el-dropdown-item>
                                     <el-dropdown-item @click="handleChangePassword">修改密码</el-dropdown-item>
                                     <el-dropdown-item divided @click="handleLoginOut">退出登录</el-dropdown-item>
                                 </el-dropdown-menu>
@@ -54,29 +52,29 @@
         </el-affix>
 
         <div class="body">
-            <!-- 学生端路由出口 -->
+            <!-- 教师端子路由出口 -->
             <router-view></router-view>
         </div>
     </div>
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
 import { CirclePlus, UserFilled, ArrowDown } from '@element-plus/icons-vue';
-import { useStudentStore } from '@/store'
+import { useTeacherStore } from '@/store'
 import router from '../../router';
 
-const studentStore = useStudentStore()
+const teacherStore = useTeacherStore()
 
-// 菜单切换
-const activeTMenu = ref('首页') 
+// 头部菜单切换
 const radioChange = (item:any) => {
-    if (activeTMenu.value === item )  return 
-    activeTMenu.value = item;
-}
-
-const handleClickClass = () => {
-    //我的课程跳转
+    if (teacherStore.activeHomeHeaderMenu === item )  return 
+    if (item == '首页') {
+        router.push({name: 'teacher-index'});
+        // window.location.reload();
+    }else {
+        router.push({name: 'teacher_resource'});
+    }
+    teacherStore.setActiveHomeHeaderMenu(item);
 }
 
 //修改密码
@@ -87,7 +85,7 @@ const handleChangePassword = () => {
 //退出登录
 const handleLoginOut = () => {
     router.push('/login');
-    studentStore.setUserName('');
+    teacherStore.teacherInfo({})
 }
 </script>
 
@@ -98,11 +96,11 @@ const handleLoginOut = () => {
     flex-flow: row nowrap;
     align-items: center;
     color: #fff;
-    margin-left: -400px;
     .tabs-temp {   
-        max-width: 50px;
+        max-width: 70px;
         height: 30px;
         margin-right: 20px;
+        padding: 4px 0px;
         font-size: 12px;
         line-height: 32px;
         white-space: nowrap;

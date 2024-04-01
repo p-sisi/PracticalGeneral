@@ -341,7 +341,6 @@ export const STUDENT_SIGN_IN_DATA = [
         endTime: '2020-12-31 12:12:12',     //截止时间
         signTime: '2020-12-31 12:12:12',    //签到时间
         status: 4,   //签到状态   0 缺勤   1 出勤   2 迟到   3 请假  4 未签到
-        code: 1242   //签到码
     },
     {
         id:2,
