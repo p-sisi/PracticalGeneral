@@ -4,9 +4,15 @@
             <div class="title">实训教学过程</div>
             <div class="introduce">解锁创新教学，畅享实训之旅！为您提供全方位的教学支持和管理工具。轻松规划、组织和追踪实训课程，让学生获得实践技能，激发潜能。</div>
             <div class="introduce">全面管理学生、教师和资源，提供实时监控和评估，助力优化教学效果。打破传统教学束缚，开启互动协作新时代！</div>
-            <el-input v-model="addClassNumber" style="width: 300px" placeholder="请输入加课码" class="input">
+            <el-input 
+                v-show="commonStore.userType == '学生'"
+                class="input" 
+                v-model="addClassNumber" 
+                style="width: 300px" 
+                placeholder="请输入加课码" 
+                maxlength="6">
                 <template #append>
-                    <el-button :icon="Right">立即加入</el-button>
+                    <el-button :icon="Right" @click="handleAddCourse">立即加入</el-button>
                 </template>
             </el-input>
         </div>
@@ -36,28 +42,39 @@
                         </div>
                     </div>
                     <div class="search">
-                        <el-input v-model="searchClassValue" style="width: 240px" placeholder="搜索课程名称、授课老师" :suffix-icon="Search"/>
+                        <el-input 
+                        v-model="searchClassValue" 
+                        style="width: 240px" 
+                        placeholder="搜索课程名称、授课老师" 
+                        :suffix-icon="Search"
+                        @blur="handleSearch"
+                        @keydown.enter="handleSearch"/>
                     </div>
                 </div>
 
                 <!-- 课程列表 -->
                 <div class="list">
                     <div 
+                        v-if="courseData.length !== 0"
                         class="list-item"
-                        v-for="item in CLASS_LIST_DATA"
-                        :key="item.classId"
+                        v-for="item in courseData"
+                        :key="item.courseId"
                         @click="handleClickClass(item)"
                         >
-                        <div class="name">{{ item.className }}</div>
-                        <el-image style="width: 100%; height: 180px" :src="item.imgUrl" fit="fit" />
+                        <div class="name">{{ item.courseName }}</div>
+                        <el-image style="width: 100%; height: 180px" src="https://fuss10.elemecdn.com/e/5d/4a731a90594a4af544c0c25941171jpeg.jpeg" fit="fit" />
                         <div class="user">
-                            <span v-if="item.status == 1" style="color:#529949">进行中...</span>
+                            <span v-if="item.isOver == false" style="color:#529949">进行中...</span>
                             <span v-else style="color: #ccc;">已结束</span>
                             <div class="user-detail">
                                 <el-avatar size="small" src="https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png" />
-                                <span>{{ item.teacher }}</span>
+                                <span>{{ item.teacherName }}</span>
                             </div>
                         </div>
+                    </div>
+                    <div v-else class="list-empty">
+                        <img src="/src/assets/images/no-message.png" alt="">
+                        <span>暂无课程</span>
                     </div>
                 </div>
             </div>
@@ -121,15 +138,21 @@
 <script setup lang="ts">
 import { ref, onMounted, Ref } from 'vue';
 import { Right, Search, Loading } from '@element-plus/icons-vue'
-import { CLASS_STATUS, CLASS_LIST_DATA, Notice } from '../../content/student'
-import { useStudentStore } from '@/store'
+import { ElMessage } from 'element-plus';
+import { CLASS_STATUS } from '../../content/student'
+import { Course } from '../../content/course';
+import { Notice } from '../../content/notice';
+import { useStudentStore, useCommonStore } from '@/store'
 import router from '@/router/index.ts';
-import { fetchGetAllCourseNotice, fetchGetAllSysNotice } from '../../apis/modules/notice';
+import { fetchGetAllCourseNotice, fetchGetAllSysNotice, } from '../../apis/modules/notice';
+import { fetchGetAllCourseStudent, fetchAddCourse } from '../../apis/modules/course';
 
-const studentStore = useStudentStore()
+const studentStore = useStudentStore();
+const commonStore = useCommonStore();
 
 onMounted(() => {
     getNoticeListRequest('系统公告');
+    getClassListRequest();
 })
 
 const isRefreshing = ref(false);   //刷新遮罩层
@@ -139,15 +162,33 @@ const tabChange = (label: any) => {
     studentStore.setActiveHomeTab(label);
 }
 
-//课程
+//加入课程
 const addClassNumber = ref('');
 
+const handleAddCourse = async () => {
+    try {
+        const params = {
+            addCode: addClassNumber.value
+        }
+        await fetchAddCourse(params);
+        ElMessage.success('加入课程成功！');
+
+        getClassListRequest();
+    } catch (error: any) {
+        ElMessage.error(error.message)
+    }
+}
+
+//获取课程
+const courseData: Ref<Course[]> = ref([]);  //处理后的课程列表
+const courseDataAll: Ref<Course[]> = ref([]);  //所有课程列表
 const getClassListRequest = async () => {
     try {
-        //TODO：获取课程列表请求
-
+        const result = await fetchGetAllCourseStudent();
+        courseData.value = result.data;
+        courseDataAll.value = result.data;
     } catch (error) {
-        
+        ElMessage.error('获取课程失败，请稍候再试！')
     }
 }
 
@@ -169,13 +210,31 @@ const handleClickClass = (item:any) => {
 const activeClassStatus = ref('全部');
 const classStatusChange = (label: any) => {
     if (activeClassStatus.value === label )  return 
+
     activeClassStatus.value = label;
-    //TODO：课程状态切换更新课程列表
+
+    courseData.value = courseDataAll.value;
+    
+    if(label == '全部') {
+        courseData.value = courseDataAll.value;
+    } else if(label == '进行中') {
+        courseData.value = courseData.value.filter((item:any) => item.isOver == false);
+    } else {
+        courseData.value = courseData.value.filter((item:any) => item.isOver == true);
+    };
+
+    if(searchClassValue.value !== '') {
+        handleSearch();
+    }
 }
 
 const searchClassValue = ref('');
 
-//公告
+/*
+*   获取公告列表
+*   type: 公告类型
+*   isRefresh: 是否刷新
+*/
 const courseNoticeData: Ref<Notice[]> = ref([]);   //公告列表
 
 const getNoticeListRequest = async(type: string) => {
@@ -227,6 +286,20 @@ const handleRefresh = () => {
     isRefreshLoading.value = true;
     getNoticeListRequest(activeNoticeType.value);
 } 
+
+//搜索
+const handleSearch = () => {
+    if(searchClassValue.value == '') {
+        return courseData.value = courseDataAll.value;
+    }
+    classStatusChange(activeClassStatus.value);
+    courseData.value = courseData.value.filter((item:any) => {
+        return (
+            item.courseName.includes(searchClassValue.value) || 
+            item.teacherName.includes(searchClassValue.value)  
+        )
+    });
+}
 </script>
 
 <style scoped lang="scss">
@@ -238,7 +311,7 @@ const handleRefresh = () => {
         flex-flow: column nowrap;
         justify-content: center;
         align-items: center;
-        height: 180px;
+        padding: 16px 0px;
         background-image: url('../../assets/images/student-home.jpg');
         background-size: 100% 100%;
         .title {
@@ -351,6 +424,22 @@ const handleRefresh = () => {
                 &-item:hover {
                     box-shadow: 0px 0px 10px #5a8bd6;
                 }
+                &-empty {
+                    width: 100%;
+                    margin-top: 40px;
+                    display: flex;
+                    flex-flow: column nowrap;
+                    justify-content: center;
+                    align-items: center;
+                    gap: 10px;
+                    img {
+                        width: 100px;
+                    }
+                    span {
+                        font-size: 12px;
+                        color: #999;
+                    }
+                }
             }
         }
         
@@ -437,24 +526,24 @@ const handleRefresh = () => {
                     position: absolute;
                     top: 0;
                     left: 0;
+                    padding-top: 30px;
                     width: 100%;
                     height: 100%;
                     background-color: rgba(255, 255, 255, 0.8); /* 使用半透明的白色作为背景 */
                     z-index: 9999; /* 确保遮罩在最上层 */
                     display: flex;
                     justify-content: center;
-                    align-items: center;
                     }
 
                     .refresh-mask::before {
-                    content: "";
-                    display: inline-block;
-                    width: 40px;
-                    height: 40px;
-                    border: 4px solid #ccc;
-                    border-top-color: #333;
-                    border-radius: 50%;
-                    animation: spin 1s linear infinite; /* 添加旋转动画效果 */
+                        content: "";
+                        display: inline-block;
+                        width: 40px;
+                        height: 40px;
+                        border: 4px solid #ccc;
+                        border-top-color: #333;
+                        border-radius: 50%;
+                        animation: spin 1s linear infinite; /* 添加旋转动画效果 */
                     }
 
                     @keyframes spin {

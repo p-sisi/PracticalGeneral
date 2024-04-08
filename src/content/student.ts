@@ -14,67 +14,6 @@ export const CLASS_STATUS = [
     }
 ]
 
-//课程列表
-export const CLASS_LIST_DATA = [
-    {
-        classId: 1,
-        className: '计算机导论',
-        imgUrl: 'https://fuss10.elemecdn.com/e/5d/4a731a90594a4af544c0c25941171jpeg.jpeg',
-        teacher: '杨思远',
-        status: 1,    //1：正在进行中  0：已结束
-    },
-    {
-        classId: 2,
-        className: '高等数学',
-        imgUrl: 'https://fuss10.elemecdn.com/e/5d/4a731a90594a4af544c0c25941171jpeg.jpeg',
-        teacher: '杨思远',
-        status: 0,
-    },
-    {
-        classId: 3,
-        className: '线性代数',
-        imgUrl: 'https://fuss10.elemecdn.com/e/5d/4a731a90594a4af544c0c25941171jpeg.jpeg',
-        teacher: '杨思远',
-        status: 1,
-    },
-    {
-        classId: 4,
-        className: '大学英语',
-        imgUrl: 'https://fuss10.elemecdn.com/e/5d/4a731a90594a4af544c0c25941171jpeg.jpeg',
-        teacher: '杨思远',
-        status: 0,
-    },
-    {
-        classId: 5,
-        className: 'Python编程',
-        imgUrl: 'https://fuss10.elemecdn.com/e/5d/4a731a90594a4af544c0c25941171jpeg.jpeg',
-        teacher: '杨思远',
-        status: 1,
-    },
-    {
-        classId: 6,
-        className: '数据结构',
-        imgUrl: 'https://fuss10.elemecdn.com/e/5d/4a731a90594a4af544c0c25941171jpeg.jpeg',
-        teacher: '杨思远',
-        status: 0,
-    },
-    {
-        classId: 7,
-        className: '计算机组成原理',
-        imgUrl: 'https://fuss10.elemecdn.com/e/5d/4a731a90594a4af544c0c25941171jpeg.jpeg',
-        teacher: '杨思远',
-        status: 1,
-    },
-    {
-        classId: 8,
-        className: '操作系统',
-        imgUrl: 'https://fuss10.elemecdn.com/e/5d/4a731a90594a4af544c0c25941171jpeg.jpeg',
-        teacher: '杨思远',
-        status: 0,
-    }
-]
-
-
 //课程详情页菜单
 export const COURSE_MENU = [
     {
@@ -305,18 +244,3 @@ export const STUDENT_SIGN_IN_DATA = [
         status: 3,
     }
 ]
-
-//公告详情信息
-export interface Notice {
-    noticeId: number;   
-    courseId: number;
-    content: string;       //内容
-    createTime: string;    //发布时间
-    updateTime: string;    //更新时间
-    creatorName: string;   //发布者名称
-    isRead: false;         //是否已读
-    isTop: true;          //是否置顶
-    noticeType: number;   //课程类型： 0 系统公告 1 课程公告
-    courseName: string;   //公告来源课程名称
-    title: string;        //标题
-}

@@ -2,26 +2,29 @@
     <div class="container">
         <el-affix>
             <div class="header">
-                <!-- 左边 -->
-                <div class="header-left">
-                    <span class="iconfont icon-shuben-book3"></span>
-                    <div v-show="commonStore.userType == '学生'">实训管理系统（学生端）</div>
-                    <div v-show="commonStore.userType == '教师'">实训管理系统（教师端）</div>
-                </div>
+                <div style="display: flex;gap: 40px;">
+                    <!-- 左边 -->
+                    <div class="header-left">
+                        <span class="iconfont icon-shuben-book3"></span>
+                        <div v-show="commonStore.userType == '学生'">实训管理系统（学生端）</div>
+                        <div v-show="commonStore.userType == '教师'">实训管理系统（教师端）</div>
+                    </div>
 
-                <!-- 中间菜单头 -->
-                <div class="tabs-change">
-                    <div 
-                        v-for="item in studentStore.menuList"   
-                        @click="radioChange(item)" 
-                        class="tabs-temp" 
-                        :class="{ 'selected': item === studentStore.activeMenu }"
-                    >
-                        <el-tooltip :content="item" placement="bottom" effect="light">
-                            <span>{{ item }}</span>
-                        </el-tooltip>
+                    <!-- 中间菜单头 -->
+                    <div class="tabs-change">
+                        <div 
+                            v-for="item in studentStore.menuList"   
+                            @click="radioChange(item)" 
+                            class="tabs-temp" 
+                            :class="{ 'selected': item === studentStore.activeMenu }"
+                        >
+                            <el-tooltip :content="item" placement="bottom" effect="light">
+                                <span>{{ item }}</span>
+                            </el-tooltip>
+                        </div>
                     </div>
                 </div>
+
 
                 <!-- 右边 -->
                 <div class="header-right">
@@ -76,7 +79,7 @@ import router from '../../router';
 const studentStore = useStudentStore();
 const commonStore = useCommonStore();
 
-// 菜单切换
+// 头部菜单切换
 const radioChange = (item:any) => {
     if (studentStore.activeMenu === item )  return 
     if (item == '首页') {
@@ -90,7 +93,7 @@ const radioChange = (item:any) => {
 
 //修改密码
 const handleChangePassword = () => {
-
+    //TODO:修改密码请求
 }
 
 //退出登录
@@ -119,7 +122,7 @@ const handleLoginOut = () => {
         text-overflow: ellipsis;
         cursor: pointer;
     }
-    .tabs-temp.selected {     //选中时的样式
+    .tabs-temp.selected {  
         border-bottom: 2px solid #fff;
         border-radius: 2px;
         font-size: 16px;

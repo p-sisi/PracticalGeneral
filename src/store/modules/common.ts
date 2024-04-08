@@ -9,7 +9,7 @@ export interface userInfo {
     userType: number;  //用户类型
 }
 export interface CommonState{
-    userType: string;   //用户类型    0 管理员 1教师 2学生
+    userType: string;   //用户类型    教师，学生，管理员
     userInfo: object;   //用户信息
 }
 
