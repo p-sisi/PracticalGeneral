@@ -13,10 +13,10 @@
                     <!-- 中间菜单头 -->
                     <div class="tabs-change">
                         <div 
-                            v-for="item in studentStore.menuList"   
+                            v-for="item in commonStore.headerMenu"   
                             @click="radioChange(item)" 
                             class="tabs-temp" 
-                            :class="{ 'selected': item === studentStore.activeMenu }"
+                            :class="{ 'selected': item === commonStore.activeHeaderMenu }"
                         >
                             <el-tooltip :content="item" placement="bottom" effect="light">
                                 <span>{{ item }}</span>
@@ -81,14 +81,23 @@ const commonStore = useCommonStore();
 
 // 头部菜单切换
 const radioChange = (item:any) => {
-    if (studentStore.activeMenu === item )  return 
+    if (commonStore.activeHeaderMenu === item )  return 
     if (item == '首页') {
-        router.push({name: 'student-home'});
-        // window.location.reload();
+        if(commonStore.userType == '学生'){
+            router.push({name: 'student_home'});
+        }else {
+            router.push({name: 'teacher_index'});
+        }
     }else {
-        router.push({name: 'resource'});
+        commonStore.setActiveClass( commonStore.courseData.filter( (value:any) => value.courseName == item)[0] )
+        if(commonStore.userType == '学生') {
+            router.push({ name: 'student_resource',query: { id: commonStore.activeClass.courseId }})
+        } else {
+            router.push({ name: 'teacher_resource',query: { id: commonStore.activeClass.courseId }})
+        }
     }
-    studentStore.setActiveMenu(item);
+    commonStore.setActiveHeaderMenu(item);
+
 }
 
 //修改密码
@@ -99,7 +108,7 @@ const handleChangePassword = () => {
 //退出登录
 const handleLoginOut = () => {
     router.push('/login');
-    studentStore.setUserName('');
+    commonStore.setUserInfo({});
 }
 </script>
 
@@ -108,12 +117,12 @@ const handleLoginOut = () => {
 .tabs-change {
     display: flex;   
     flex-flow: row nowrap;
+    gap: 20px;
     align-items: center;
     color: #fff;
     .tabs-temp {   
         max-width: 70px;
         height: 30px;
-        margin-right: 20px;
         padding: 4px 0px;
         font-size: 12px;
         line-height: 32px;

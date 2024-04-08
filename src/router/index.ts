@@ -53,7 +53,7 @@ const routes = [
         children: [
             {
               path: 'home',
-              name: 'student-home',
+              name: 'student_home',
               component: () => import('../views/student/Home.vue'),
             },
             {
@@ -64,47 +64,47 @@ const routes = [
                     {
                         // 课程详情页路由
                         path: 'resource',
-                        name: 'resource',
+                        name: 'student_resource',
                         component: () => import('../views/student/ClassResource.vue'),
                     },
                     {
                         path: 'notice',
-                        name: 'notice',
+                        name: 'student_notice',
                         component: () => import('../views/student/ClassNotice.vue'),
                     },
                     {
                         path: 'task',
-                        name: 'task',
+                        name: 'student_task',
                         component: () => import('../views/student/ClassTask.vue'),
                     },
                     {
                         path: 'discuss',
-                        name: 'discuss',
+                        name: 'student_discuss',
                         component: () => import('../views/student/ClassDiscuss.vue'),
                     },
                     {
                         path: 'analyze',
-                        name: 'analyze',
+                        name: 'student_analyze',
                         component: () => import('../views/student/ClassAnalyze.vue'),
                     },
                     {
                         path: 'check_in',
-                        name: 'check_in',
+                        name: 'student_check_in',
                         component: () => import('../views/student/ClassCheckIn.vue'),
                     },
                     {
                         path: 'reply',
-                        name: 'reply',
+                        name: 'student_reply',
                         component: () => import('../views/student/ClassReply.vue'),
                     },
                     {
                         path: 'member',
-                        name: 'member',
+                        name: 'student_member',
                         component: () => import('../views/student/ClassMember.vue'),
                     },
                     {
                         path: 'survey',
-                        name: 'survey',
+                        name: 'student_survey',
                         component: () => import('../views/student/ClassSurvey.vue'),
                     },
                     
@@ -120,7 +120,7 @@ const routes = [
         children: [
             {
               path: 'index',
-              name: 'teacher-index',
+              name: 'teacher_index',
               component: () => import('../views/teacher/Home.vue'),
             },
             {
@@ -136,42 +136,42 @@ const routes = [
                     },
                     {
                         path: 'notice',
-                        name: 'notice',
+                        name: 'teacher_notice',
                         component: () => import('../views/student/ClassNotice.vue'),
                     },
                     {
                         path: 'task',
-                        name: 'task',
+                        name: 'teacher_task',
                         component: () => import('../views/student/ClassTask.vue'),
                     },
                     {
                         path: 'discuss',
-                        name: 'discuss',
+                        name: 'teacher_discuss',
                         component: () => import('../views/student/ClassDiscuss.vue'),
                     },
                     {
                         path: 'analyze',
-                        name: 'analyze',
+                        name: 'teacher_analyze',
                         component: () => import('../views/student/ClassAnalyze.vue'),
                     },
                     {
                         path: 'check_in',
-                        name: 'check_in',
+                        name: 'teacher_check_in',
                         component: () => import('../views/student/ClassCheckIn.vue'),
                     },
                     {
                         path: 'reply',
-                        name: 'reply',
+                        name: 'teacher_reply',
                         component: () => import('../views/student/ClassReply.vue'),
                     },
                     {
                         path: 'member',
-                        name: 'member',
+                        name: 'teacher_member',
                         component: () => import('../views/student/ClassMember.vue'),
                     },
                     {
                         path: 'survey',
-                        name: 'survey',
+                        name: 'teacher_survey',
                         component: () => import('../views/student/ClassSurvey.vue'),
                     },
                     

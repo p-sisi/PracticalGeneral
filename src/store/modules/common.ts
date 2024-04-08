@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia';
-import { USER_TYPE } from '../../content/common'
+import { USER_TYPE } from '../../content/common';
+import { Course } from '@/content/course';
 
 //用户信息接口
 export interface userInfo {
@@ -11,12 +12,20 @@ export interface userInfo {
 export interface CommonState{
     userType: string;   //用户类型    教师，学生，管理员
     userInfo: object;   //用户信息
+    activeHeaderMenu: string;   //当前激活的头部菜单
+    headerMenu: string[];   //头部菜单
+    activeClass: object;   //当前激活的课程
+    courseData: object;   //课程数据
 }
 
 export const useCommonStore = defineStore("common",{
     state: (): CommonState => ({
         userType: '',
         userInfo: {} as UserInfo,
+        activeHeaderMenu: '' ,
+        headerMenu: ['首页'],
+        activeClass: {} as Course,
+        courseData: {} as Course[],
     }),
     getters:{
     },
@@ -26,6 +35,18 @@ export const useCommonStore = defineStore("common",{
         },
         setUserInfo(info: object) {
             this.userInfo = info;
+        },
+        setActiveHeaderMenu(menu: string) {
+            this.activeHeaderMenu = menu;
+        },
+        addHeaderMenu(menu: string) {
+            this.headerMenu.push(menu);
+        },
+        setActiveClass(course: Course) {
+            this.activeClass = course;
+        },
+        setCourseData(data: Course[]) {
+            this.courseData = data;
         }
     },
     persist: [

@@ -164,7 +164,6 @@ const tabChange = (label: any) => {
 
 //加入课程
 const addClassNumber = ref('');
-
 const handleAddCourse = async () => {
     try {
         const params = {
@@ -187,6 +186,9 @@ const getClassListRequest = async () => {
         const result = await fetchGetAllCourseStudent();
         courseData.value = result.data;
         courseDataAll.value = result.data;
+
+        //保存课程数据
+        commonStore.setCourseData(result.data)
     } catch (error) {
         ElMessage.error('获取课程失败，请稍候再试！')
     }
@@ -194,16 +196,19 @@ const getClassListRequest = async () => {
 
 //点击课程item
 const handleClickClass = (item:any) => {
-    studentStore.setActiveClass(item);
+    commonStore.setActiveClass(item);
 
-    if(!studentStore.menuList.includes(item.className)) {
-        studentStore.addMenuList(item.className);
+    if(!commonStore.headerMenu.includes(item.courseName)) {
+        commonStore.addHeaderMenu(item.courseName);
     }
         
-    studentStore.setActiveMenu(item.className);
+    commonStore.setActiveHeaderMenu(item.courseName);
 
-    //TODO:跳转课程详情，路由添加参数：课程id
-    router.push({ name: 'resource'})
+    if(commonStore.userType == '教师') {
+        router.push({ name: 'teacher_resource',query: { id: item.courseId }})
+    }else {
+        router.push({ name: 'student_resource',query: { id: item.courseId }})
+    }
 }
 
 //切换课程状态
