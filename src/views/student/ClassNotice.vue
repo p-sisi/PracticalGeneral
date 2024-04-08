@@ -19,17 +19,17 @@
         <div class="notice-item">
             <div 
                 class="item"
-                v-for="item in NOTICE_LIST_DATA"
-                :class="{ 'read': item.status === 1, 'unread': item.status === 0 }"
+                v-for="item in courseNoticeData"
+                :class="{ 'read': item.isRead, 'unread': item.isRead}"
             >
                 <div class="item-title">
                     <div>{{ item.title }}</div>
-                    <span style="color:#ccc;font-size: 14px;" v-if="item.status === 1">已读</span>
+                    <span style="color:#ccc;font-size: 14px;" v-if="item.isRead">已读</span>
                     <span style="color: #4186ff;cursor: pointer;font-size: 14px;" v-else @click="handleRead(item)">标为已读</span>
                 </div>
                 <div class="item-content">{{item.content}}</div>
                 <div class="item-footer">
-                    <div>发布者：{{ item.publisher }}</div>
+                    <div>发布者：{{ item.creatorName }}</div>
                     <div>发布：{{ item.createTime }}</div>
                     <div>最近一次更新：{{item.updateTime}}</div>
                 </div>
@@ -39,28 +39,57 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
-import { NOTICE_LIST_DATA } from '../../content/student';
-import { Loading } from '@element-plus/icons-vue'
+import { ref, onMounted, Ref } from 'vue';
+import { Loading } from '@element-plus/icons-vue';
+import { ElMessage } from 'element-plus';
+import { fetchGetAllCourseNotice, fetchReadNotice } from '../../apis/modules/notice';
+import { Notice } from '../../content/notice';
 
+onMounted(() => {
+    getCourseDataRequest();
+})
 
-//全部标为已读
-const handleAllRead = () => {
-
+//获取课程公告
+const courseNoticeData: Ref<Notice[]> = ref([]);
+const getCourseDataRequest = async () => {
+    try {
+        const result = await fetchGetAllCourseNotice();
+        courseNoticeData.value = result.data;
+    } catch (error) {
+        ElMessage.error('获取公告失败，请稍候再试！');
+    }
 }
 
 //刷新公告
 const isRefreshLoading = ref(false);
 const handleRefresh = () => {
     if(isRefreshLoading.value == true) return
-    //TODO:刷新，重新请求公告
-
-    //刷新结束
+    getCourseDataRequest();
     isRefreshLoading.value = true;
 }
 
-const handleRead = (item: any) => {
-    //TODO：根据id修改公告状态
+//已读公告
+const setReadNoticeRequest = async (ids: any) => {
+    try {
+        const params = {
+            ids: ids
+        }
+        await fetchReadNotice(params);
+        getCourseDataRequest();
+    } catch (error) {
+        ElMessage.error('修改失败，请稍候再试！');
+    }
+}
+
+const handleRead = async (item: any) => {
+    const idArray = [item.noticeId];
+    console.log(idArray)
+    setReadNoticeRequest(idArray);
+}
+
+const handleAllRead = () => {
+    const idArray: any[] = courseNoticeData.value.filter( (item: any) => item.isRead == false ).map( (item: any) => item.noticeId );
+    setReadNoticeRequest(idArray)
 }
 </script>
 

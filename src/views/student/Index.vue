@@ -28,11 +28,11 @@
 
                 <!-- 右边 -->
                 <div class="header-right">
-                    <div style="cursor: pointer;" @click="studentStore.setActiveHomeTab('公告栏')">
+                    <div style="cursor: pointer;" @click="handleClickNotice">
                         <span class="iconfont icon-xiaoxi"></span>
                         <span style="margin-left: 2px;">公告</span>
                     </div>
-                    <div class="header-right-add" v-show="commonStore.userType == '学生'">
+                    <div class="header-right-add" v-show="commonStore.userType == '学生'" @click="dialogVisible = true">
                         <el-icon><CirclePlus /></el-icon>
                         <div>加入课程</div>
                     </div>
@@ -46,7 +46,7 @@
                             </div>
                             <template #dropdown>
                                 <el-dropdown-menu>
-                                    <el-dropdown-item @click="studentStore.setActiveHomeTab('我的课程')">我的课程</el-dropdown-item>
+                                    <el-dropdown-item @click="handleClickMyClass">我的课程</el-dropdown-item>
                                     <el-dropdown-item @click="handleChangePassword">修改密码</el-dropdown-item>
                                     <el-dropdown-item divided @click="handleLoginOut">退出登录</el-dropdown-item>
                                 </el-dropdown-menu>
@@ -67,17 +67,74 @@
             <!-- 学生端路由出口 -->
             <router-view></router-view>
         </div>
+
+        <!-- 加入课程弹窗 -->
+        <el-dialog
+            v-model="dialogVisible"
+            title="加入课程"
+            width="500"
+            draggable
+        >
+        <div>
+            <span>课堂加课码：</span>
+            <el-input v-model="inputCode" style="width: 300px" placeholder="请输入课程加课码" clearable maxlength="6"/>
+        </div>
+
+            <template #footer>
+                <div class="dialog-footer">
+                    <el-button @click="dialogVisible = false">取消</el-button>
+                    <el-button type="primary" @click="handleAddCourse" color="#4186ff"> 加入</el-button>
+                </div>
+            </template>
+        </el-dialog>
     </div>
 </template>
 
 <script setup lang="ts">
 import { ref } from 'vue';
 import { CirclePlus, UserFilled, ArrowDown, Close } from '@element-plus/icons-vue';
+import { ElMessage } from 'element-plus';
 import { useStudentStore, useCommonStore } from '@/store'
+import { fetchAddCourse } from '../../apis/modules/course';
 import router from '../../router';
+import { useRouter } from 'vue-router';
+
+const route = useRouter();
 
 const studentStore = useStudentStore();
 const commonStore = useCommonStore();
+
+const dialogVisible = ref(false);
+const inputCode = ref('');
+
+// 加入课程
+const handleAddCourse = async () => {
+    try {
+        const params = {
+            addCode: inputCode.value
+        }
+        const result = await fetchAddCourse(params);
+        const newClass = result.data
+
+        ElMessage.success('加入课程成功！');
+        dialogVisible.value = false;
+        inputCode.value = '';
+
+        commonStore.setActiveHeaderMenu(newClass.courseName);
+        commonStore.addHeaderMenu(newClass.courseName);
+        commonStore.setActiveClass(newClass);
+        commonStore.setCourseData([...commonStore.courseData, newClass]);
+        
+        if(commonStore.userType == '学生'){
+            router.push({ name: 'student_resource',query: { id: newClass.courseId }})
+        } else {
+            router.push({ name: 'teacher_resource',query: { id: newClass.courseId }})
+        }
+
+    } catch (error: any) {
+        ElMessage.error(error.message)
+    }
+}
 
 // 头部菜单切换
 const radioChange = (item:any) => {
@@ -90,6 +147,7 @@ const radioChange = (item:any) => {
         }
     }else {
         commonStore.setActiveClass( commonStore.courseData.filter( (value:any) => value.courseName == item)[0] )
+        console.log(commonStore.activeClass)
         if(commonStore.userType == '学生') {
             router.push({ name: 'student_resource',query: { id: commonStore.activeClass.courseId }})
         } else {
@@ -98,6 +156,21 @@ const radioChange = (item:any) => {
     }
     commonStore.setActiveHeaderMenu(item);
 
+}
+
+//点击公告
+const handleClickNotice = () => {
+    if(route.currentRoute.value.query.id) {
+        router.push({name: 'student_notice'})
+    } else {
+        studentStore.setActiveHomeTab('公告栏')
+    }
+}
+
+//点击我的课程
+const handleClickMyClass = () => {
+    router.push({name: 'student_home'})
+    studentStore.setActiveHomeTab('我的课程')
 }
 
 //修改密码

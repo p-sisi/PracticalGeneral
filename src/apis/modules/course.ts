@@ -16,3 +16,11 @@ export function fetchGetAllCourseStudent() {
 export function fetchAddCourse(params: object) {
     return request.get('/course/stuJoinCourse',params);
 }
+
+/**
+ * 学生自主退出课程
+ * @params courseId 课程id 
+ */
+export function fetchExitCourseByStudent(params: any) {
+    return request.get('/course/stuExitCourse',params);
+}

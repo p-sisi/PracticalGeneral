@@ -118,7 +118,7 @@
                         <div class="item-title">
                             <div>{{ item.title }}</div>
                             <span style="color:#ccc;font-size: 14px;" v-if="item.isRead">已读</span>
-                            <span style="color: #4186ff;cursor: pointer;font-size: 14px;" v-else @click="handleRead(item)">标为已读</span>
+                            <span style="color: #4186ff;cursor: pointer;font-size: 14px;" v-else @click.stop="handleRead(item)">标为已读</span>
                         </div>
                         <div class="item-content">{{item.content}}</div>
                         <div class="item-footer">
@@ -144,7 +144,7 @@ import { Course } from '../../content/course';
 import { Notice } from '../../content/notice';
 import { useStudentStore, useCommonStore } from '@/store'
 import router from '@/router/index.ts';
-import { fetchGetAllCourseNotice, fetchGetAllSysNotice, } from '../../apis/modules/notice';
+import { fetchGetAllCourseNotice, fetchGetAllSysNotice, fetchReadNotice } from '../../apis/modules/notice';
 import { fetchGetAllCourseStudent, fetchAddCourse } from '../../apis/modules/course';
 
 const studentStore = useStudentStore();
@@ -272,15 +272,30 @@ const noticeItemClick = (item: any) => {
     //TODO:如果公告类型不为系统公告，则根据课程id跳转至所有课程详情页
     if(item.noticeType == 'system') return
     //TODO:根据id跳转
+    console.log(item)
 }
 
-const handleRead = (item: any) => {
-    //TODO：根据id修改公告状态
+//已读公告
+const setReadNoticeRequest = async (ids: any[]) => {
+    try {
+        const params = {
+            ids
+        }
+        await fetchReadNotice(params);
+        getNoticeListRequest(activeNoticeType.value);
+    } catch (error) {
+        ElMessage.error('修改失败，请稍候再试！');
+    }
 }
 
+const handleRead = async (item: any) => {
+    const idArray = [item.noticeId];
+    setReadNoticeRequest(idArray);
+}
 
 const handleAllRead = () => {
-    //TODO:全部公告标为已读，考虑与单个公告合并方法
+    const idArray: any[] = courseNoticeData.value.filter( (item: any) => item.isRead == false ).map( (item: any) => item.noticeId );
+    setReadNoticeRequest(idArray)
 }
 
 //刷新公告

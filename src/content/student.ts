@@ -14,55 +14,6 @@ export const CLASS_STATUS = [
     }
 ]
 
-//课程详情页菜单
-export const COURSE_MENU = [
-    {
-        label: '课程资源',
-        name: 'course',
-        route: 'resource'
-    },
-    {
-        label: '课程公告',
-        name: 'notice',
-        route: 'notice'
-    },
-    {
-        label: '实训作业',
-        name: 'task',
-        route: 'task'
-    },
-    {
-        label: '成员',
-        name: 'member',
-        route: 'member'
-    },
-    {
-        label: '讨论',
-        name: 'discuss',
-        route: 'discuss'
-    },
-    {
-        label: '成绩分析',
-        name: 'analysis',
-        route: 'analyze'
-    },
-    {
-        label: '考勤',
-        name: 'check_in',
-        route: 'check_in'
-    },
-    {
-        label: '答辩',
-        name: 'reply',
-        route: 'reply'
-    },
-    {
-        label: '问卷调查',
-        name: 'survey',
-        route: 'survey'
-    }
-]
-
 //课程详情信息
 export const COURSE_INFO = {
     courseId: 1,

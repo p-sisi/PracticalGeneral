@@ -15,3 +15,10 @@ export function fetchGetAllCourseNotice() {
 export function fetchGetAllSysNotice() {
     return request.get('/notice/getSysNotice');
 }
+
+/**
+ * 设置已读
+ */
+export function fetchReadNotice(params: object) {
+    return request.get('/notice/setNoticeIsRead',params);
+}

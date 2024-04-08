@@ -21,21 +21,22 @@
             <!-- 右侧课程简介 -->
             <div class="main-right">
                 <div class="status">
-                    <div v-if="studentStore.activeClass.status == 1" class="status-ing">进行中...</div>
+                    <div v-if="!commonStore.activeClass.isOver" class="status-ing">进行中...</div>
                     <div v-else class="status-up">已结束</div>
                 </div>
-                <div class="title">{{ studentStore.activeClass.className }}</div>
-                <div class="time">开课时间：{{ studentStore.activeClass.createTime  }}</div>
+                <div class="title">{{ commonStore.activeClass.courseName }}</div>
+                <div class="time">课号：{{ commonStore.activeClass.courseNumber }}</div>
+                <div class="time">开课时间：{{ commonStore.activeClass.createTime  }}</div>
                 <div class="teacher">
                     <el-avatar> teach </el-avatar>
-                    <div>{{ studentStore.activeClass.teacher }}</div>
+                    <div>{{ commonStore.activeClass.teacherName }}</div>
                 </div>
                 <div class="student">
                     <span class="iconfont icon-yonghu2"></span>
-                    <div>学生<span style="font-weight: 600;">&nbsp;{{ studentStore.activeClass.studentNum }}&nbsp;</span>人</div>
+                    <div>学生<span style="font-weight: 600;">&nbsp;{{ commonStore.activeClass.stuNum }}&nbsp;</span>人</div>
                 </div>
                 <div class="footer">
-                    <div class="code">加课码：<span style="font-weight: 600;">{{ studentStore.activeClass.addCode }}</span></div>
+                    <div class="code">加课码：<span style="font-weight: 600;">{{ commonStore.activeClass.addCode }}</span></div>
                     <el-button type="danger" @click="exitClass">退出课程</el-button>
                 </div>
             </div>
@@ -45,11 +46,14 @@
 
 <script setup lang="ts">
 import { onMounted } from 'vue';
-import { COURSE_MENU } from '../../content/student'
-import { useStudentStore } from '@/store'
+import { COURSE_MENU } from '../../content/common'
+import { useStudentStore, useCommonStore } from '@/store'
 import router from '@/router/index.ts';
+import { fetchExitCourseByStudent } from '../../apis/modules/course';
+import { ElMessage } from 'element-plus';
 
 const studentStore = useStudentStore();
+const commonStore = useCommonStore();
 
 onMounted(() => {
     //获取公告内容
@@ -58,12 +62,28 @@ onMounted(() => {
 const menuChange = (item: any) => {
     if (studentStore.activeClassMenu === item.label )  return 
     studentStore.setActiveClassMenu(item.label);
-    router.push({ name: item.route})
+    router.push({ name: item.routeName})
 }
 
 //退出课堂
-const exitClass = () => {
-    
+const exitClass = async () => {
+    try {
+        const params = {
+            courseId: commonStore.activeClass.courseId,
+        }
+        await fetchExitCourseByStudent(params);
+        ElMessage.success('退出课堂成功');
+        
+        if(commonStore.userType == '学生'){
+            router.push({name: 'student_home'});
+        }else {
+            router.push({name: 'teacher_index'});
+        }
+        
+    } catch (error) {
+        ElMessage.error('退出课堂失败');
+        return;
+    }
 }
 </script>
 

@@ -22,7 +22,7 @@ export const useCommonStore = defineStore("common",{
     state: (): CommonState => ({
         userType: '',
         userInfo: {} as UserInfo,
-        activeHeaderMenu: '' ,
+        activeHeaderMenu: '首页' ,
         headerMenu: ['首页'],
         activeClass: {} as Course,
         courseData: {} as Course[],

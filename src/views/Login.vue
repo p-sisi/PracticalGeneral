@@ -130,9 +130,9 @@ const handleLoginIn  = async () => {
         if(commonStore.userType == '管理员') {
             router.push({name:'admin-home'});
         }else if(commonStore.userType == '教师') {
-            router.push({name:'teacher-index'});
+            router.push({name:'teacher_index'});
         }else {
-            router.push({name:'student-home'});
+            router.push({name:'student_home'});
         }
     } catch (error) {
         ElMessage.error('登录失败！');
