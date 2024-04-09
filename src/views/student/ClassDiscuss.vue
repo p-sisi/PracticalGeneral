@@ -9,25 +9,33 @@
                     v-for="value in ['全部评论','时间排序','热度优先']" 
                     :class="{'isActive': activeTab === value}"
                      @click="changeTab(value)">{{ value }}</div>
-                <div style="font-size: 12px;margin: 4px 0px 0px 10px; ">共{{ DISCUSS_LIST_DATA.length }}个讨论</div>
+                <div style="font-size: 12px;margin: 4px 0px 0px 10px; ">共{{ discussListData.length }}个讨论</div>
             </div>
             <div>
-                <el-input v-model="inputSearch" style="width: 220px;margin-right: 20px;" placeholder="请输入" clearable :suffix-icon="Search" @click="handleSearchDiscuss"/>
+                <el-input 
+                v-model="inputSearch" 
+                style="width: 220px;margin-right: 20px;" 
+                placeholder="请输入关键词" 
+                clearable 
+                :suffix-icon="Search" 
+                @click="handleSearchDiscuss"
+                @blur="handleSearchDiscuss"
+                @keydown.enter="handleSearchDiscuss"/>
                 <el-button type="success" :icon="Plus" @click="newDiscussDrawer = true">发起讨论</el-button>
             </div>
         </div>
 
         <!-- 讨论列表 -->
         <div class="discuss-list">
-            <div class="item" v-for="item in DISCUSS_LIST_DATA" :key="item.id" @click="handleClickitem(item)">
+            <div class="item" v-for="item in discussListData" :key="item.id" @click="handleClickItem(item)">
                 <div style="display: flex;gap: 20px;align-items: center;">
                     <div> <el-avatar :size="50"> user </el-avatar></div>
                     <div class="item-text">
                         <div class="item-text-title">{{ item.title }}</div>
                         <div class="item-text-icon">
-                            <div class="name">{{ item.publisher }}</div>
-                            <div class="icon"><span class="iconfont icon-icon-"></span>{{ item.viewCount }}</div>
-                            <div class="icon"><span class="iconfont icon-huifu"></span>{{ item.replyCount }}</div>
+                            <div class="name">发起者：{{ item.creatorName }}</div>
+                            <div class="icon"><span class="iconfont icon-icon-"></span>{{ item.viewNum }}</div>
+                            <div class="icon"><span class="iconfont icon-huifu"></span>{{ item.commentNum }}</div>
                             <div class="time">{{ item.createTime }}</div>
                         </div>
                     </div>
@@ -75,37 +83,48 @@
                 <div class="publisher">
                     <div style="font-size: 24px;font-weight: 600;">{{ activeDiscussData.title }}</div>
                     <div style="display: flex;gap: 20px;font-size: 12px;align-items: center;margin-top: 4px;">
-                        <span style="font-size: 14px;">{{ activeDiscussData.publisher }}</span>
-                        <div style="color: #999;"><span class="iconfont icon-icon-"></span>{{ activeDiscussData.viewCount }}</div>
-                        <div style="color: #999;"><span class="iconfont icon-huifu"></span>{{ activeDiscussData.replyCount }}</div>
+                        <span style="font-size: 14px;">发起者：{{ activeDiscussData.creatorName }}</span>
+                        <div style="color: #999;"><span class="iconfont icon-icon-"></span>{{ activeDiscussData.viewNum }}</div>
+                        <div style="color: #999;"><span class="iconfont icon-huifu"></span>{{ activeDiscussData.commentNum }}</div>
                         <div style="color: #999;margin-left: 100px;">{{ activeDiscussData.createTime }}</div>
                     </div>
                 </div>
                 <div class="content">{{ activeDiscussData.content }}</div>
                 <div class="review">
                     <el-input v-model="inputDiscussText" style="width: 90%" placeholder="请输入评论内容" clearable type="textarea" :rows="1" autosize/>
-                    <div style="margin-left: 10px;"><el-button type="primary" >发表</el-button></div>
+                    <div style="margin-left: 10px;" @click="handleReplyDiscuss"><el-button type="primary" >发表</el-button></div>
                 </div>
 
-                <div class="reply-count">全部回复（10）</div>
+                <div class="reply-count">全部回复（{{ discussCommentData.length }}）</div>
 
                 <!-- 回复列表 -->
                 <div class="reply-list">
-                    <div class="item"  v-for="item in DISCUSS_REPLY_LIST_DATA " :key="item.id">
+                    <div class="item"  v-for="item in discussCommentData " :key="item.id">
 
                         <!-- 一级回复列表 -->
                         <div style="display: flex;width: 100%;">
-                            <el-avatar> user </el-avatar>
+                            <!-- TODO: 封装请求地址 -->
+                            <el-avatar :src="`http://10.33.18.17:8081/file/images/${item.ownerHeadImg}`"> user </el-avatar>
                             <div style="margin-left: 10px;width: 100%;">
                                 <div style="color: #999;font-size: 12px;">
-                                    <span style="margin-right: 10px;">{{ item.name }}</span>
-                                    <span>{{ item.time }}</span>
+                                    <span style="margin-right: 10px;">{{ item.ownerName }}</span>
+                                    <span>{{ item.createTime }}</span>
                                 </div>
                                 <div class="reply-1">
-                                    <div>{{ item.text }}</div>
-                                    <span @click="handleReplyClick(item)">{{isShowReplyInput && activeReplyItemId == item.id ? '收起' : '回复'}}</span>
-                                    <!-- TODO：非自己的评论不展示删除入口 -->
-                                    <span @click="handleDeleteReply1(item)">删除</span>
+                                    <div>{{ item.content }}</div>
+                                    <span @click="handleReplyClick(item)">{{ isShowReplyInput && activeReplyItemId == item.id ? '收起' : '回复'}}</span>
+                                    <el-popconfirm
+                                        confirm-button-text="删除"
+                                        cancel-button-text="取消"
+                                        icon-color="#4186ff"
+                                        :icon="InfoFilled"
+                                        title="确定删除该回复?"
+                                        @confirm="handleDeleteReply1(item)"
+                                    >
+                                        <template #reference>
+                                            <span v-if="commonStore.userInfo.userId == item.ownerId" >删除</span>
+                                        </template>
+                                    </el-popconfirm>     
                                 </div>
                                 <div  v-show="isShowReplyInput && activeReplyItemId == item.id" style="display: flex;align-items: flex-end;gap: 8px;">
                                     <el-input 
@@ -121,22 +140,35 @@
                         </div>
 
                         <div class="reply-2">
-                            <div class="reply-2-title" v-show="item.replyData.length !== 0 && isShoeReplyList == false" @click="isShoeReplyList = true">
-                                <span>---展开&nbsp;{{ item.replyData.length}}&nbsp;条回复<el-icon><ArrowDown /></el-icon></span>
+                            <div class="reply-2-title" v-show="item.secondaryCommentDTOS.length !== 0 && isShoeReplyList == false" @click="isShoeReplyList = true">
+                                <span>---展开&nbsp;{{ item.secondaryCommentDTOS.length}}&nbsp;条回复<el-icon><ArrowDown /></el-icon></span>
                             </div>
 
                             <!-- 二级回复列表 -->
-                            <div class="reply-2-list" v-for="list in item.replyData" :key="list.id" v-show="isShoeReplyList">
+                            <div class="reply-2-list" v-for="list in item.secondaryCommentDTOS" :key="list.id" v-show="isShoeReplyList">
                                 <div style="margin-top:4px;">
                                     <el-avatar :size="26" >ser</el-avatar>
                                 </div>
                                 <div class="text">
-                                    <span>{{ list.name }}<span style="margin-left: 10px;font-size:10px;">回复&nbsp;{{list.replyName}}</span>&nbsp;&nbsp;&nbsp;&nbsp;{{ list.time }}</span>
+                                    <span>
+                                        {{ list.ownerName }}<span style="color:rgba(65, 134, 255,0.6);margin: 0 4px;">回复</span>{{list.replyUserName}}
+                                        &nbsp;&nbsp;&nbsp;&nbsp;{{ list.createTime }}
+                                    </span>
                                     <div style="display:flex;align-items: flex-end;gap:10px;">
-                                        <span class="text-text">{{ list.text }}</span>
+                                        <span class="text-text">{{ list.content }}</span>
                                         <div class="text-reply" @click="handleReplyClick2(list,item)">{{isShowReplyInputList && activeReplyItemListId == list.id ? '收起' : '回复'}}</div>
-                                         <!-- TODO：非自己的评论不展示删除入口 -->
-                                        <span class="text-reply" @click="handleDeleteReply2(list,item)">删除</span>
+                                        <el-popconfirm
+                                            confirm-button-text="删除"
+                                            cancel-button-text="取消"
+                                            icon-color="#4186ff"
+                                            :icon="InfoFilled"
+                                            title="确定删除该回复?"
+                                            @confirm="handleDeleteReply2(list)"
+                                        >
+                                            <template #reference>
+                                                <span v-if="commonStore.userInfo.userId == list.ownerId" class="text-reply">删除</span>
+                                            </template>
+                                        </el-popconfirm>   
                                     </div>
                                     <div v-show="isShowReplyInputList && activeReplyItemListId == list.id" style="display: flex;align-items: flex-end;gap: 8px;">
                                         <el-input 
@@ -146,12 +178,12 @@
                                             type="textarea" 
                                             placeholder="请输入" 
                                             autosize/>
-                                        <el-button type="primary" :icon="Position" round size="small" @click="handleSendReply(list)"/>
+                                        <el-button type="primary" :icon="Position" round size="small" @click="handleSendReply2(list,item)"/>
                                     </div>
                                 </div>
                                 
                             </div>
-                            <div v-show="isShoeReplyList && item.replyData.length !== 0" @click="isShoeReplyList = false" class="reply-2-up">
+                            <div v-show="isShoeReplyList && item.secondaryCommentDTOS.length !== 0" @click="isShoeReplyList = false" class="reply-2-up">
                                 -----收起<el-icon><ArrowUp /></el-icon>
                             </div>
                         </div>
@@ -164,25 +196,84 @@
 </template>
 
 <script setup lang="ts">
-import { ref,reactive, nextTick, onMounted } from 'vue';
-import { Search, Plus, ArrowLeftBold, ArrowDown, ArrowUp, Position } from '@element-plus/icons-vue'
-import type { FormRules, FormInstance } from 'element-plus'
-import { DISCUSS_LIST_DATA, DISCUSS_REPLY_LIST_DATA } from '../../content/student'
+import { ref,reactive, Ref, onMounted } from 'vue';
+import { Search, Plus, ArrowLeftBold, ArrowDown, ArrowUp, Position, InfoFilled } from '@element-plus/icons-vue'
+import type { FormRules, FormInstance } from 'element-plus';
+import { ElMessage } from 'element-plus'
+import { Discuss, Discuss_First_Reply } from '../../content/discuss'
+import { DISCUSS_LIST_DATA, DISCUSS_REPLY_LIST_DATA } from '../../content/student';
+import { fetchDiscussByCourseId, fetchDiscussComment, fetchNewDiscuss, fetchReplyDiscuss, fetchDeleteReplyDiscuss } from '../../apis/modules/discuss';
+import { useCommonStore } from '@/store';
+
+onMounted(() => {
+    getDiscussListRequest();
+})
+
+const commonStore = useCommonStore();
+
+const discussListData: Ref<Discuss[]> = ref([]);
+const discussListDataAll: Ref<Discuss[]> = ref([]);
+
+//获取讨论列表
+const getDiscussListRequest = async () => {
+    try {
+        const params = {
+            courseId: commonStore.activeClass.courseId
+        }
+        const result = await fetchDiscussByCourseId(params);
+        discussListDataAll.value = result.data;
+        discussListData.value = result.data;
+    } catch (error) {
+        console.log(error);
+    }
+}
+
+//获取某个讨论的全部回复
+const getDiscussReplyListRequest = async (id: number) => {
+    try {
+        const params = {
+            discussionId: id
+        }
+        const result = await fetchDiscussComment(params);
+        discussCommentData.value = result.data;
+    } catch (error) {
+        console.log(error)
+    }
+}
 
 const isShowDiscussDetail = ref(false);
 
+//讨论排序类型切换
 const activeTab = ref('全部评论');
 const changeTab = (label: any) => {
     if (activeTab.value === label )  return 
     activeTab.value = label;
+    if(activeTab.value === '时间排序') {
+        discussListData.value = discussListDataAll.value.sort((a:any, b:any) => {
+            return new Date(a.createTime).getTime() - new Date(b.createTime).getTime();
+        })
+    } else if(activeTab.value === '热度优先') {
+        discussListData.value = discussListDataAll.value.sort((a:any, b:any) => {
+            return b.hotDegree - a.hotDegree;
+        })
+    }else {
+        return getDiscussListRequest();
+    }
 }
 
 
 //搜索
 const inputSearch = ref('');   
 const handleSearchDiscuss = () => {
-    if(inputSearch.value === '') return 
-    //TODO:搜索逻辑
+    if(inputSearch.value === '') return discussListData.value = discussListDataAll.value;
+    discussListData.value = discussListData.value.filter((item:any) => {
+        return (
+            item.content.includes(inputSearch.value) || 
+            item.title.includes(inputSearch.value)  ||
+            item.creatorName.includes(inputSearch.value)
+        )
+    });
+
 }
 
 //发起讨论
@@ -205,44 +296,119 @@ const rulesForm = reactive<FormRules>({
 
 const submitForm = async (formEl: FormInstance | undefined) => {
     if (!formEl) return
-    await formEl.validate((valid:any, fields:any) => {
+    await formEl.validate(async (valid:any, fields:any) => {
         if (valid) {
-            //TODO：新建讨论请求
+            try {
+                const params = {
+                    courseId: commonStore.activeClass.courseId,
+                    content: newDiscussFromData.content,
+                    title: newDiscussFromData.title,
+                }
+                await fetchNewDiscuss(params);
+                newDiscussDrawer.value = false;
+                ElMessage.success('发起讨论成功')
+
+                getDiscussListRequest();
+            } catch (error) {
+                console.log(error)
+            }
         } else {
             console.log('error submit!', fields)
         }
     })
 }
 
-const activeDiscussData = ref({
+const activeDiscussData: Ref<Discuss> = ref({
     id: 0,
+    content: '',
     title: '',
-    publisher:'',
-    viewCount: 0,
-    replyCount: 0,
-    createTime:'',
-    content: '1111',
+    createTime: '',
+    creatorHeadImg: '',
+    creatorName: '',
+    hotDegree: 0,
+    commentNum: 0,
+    viewNum: 0,
+    isTop: false,
 });
 
+const discussCommentData: Ref<Discuss_First_Reply[]>= ref([]);
+
 //点击讨论
-const handleClickitem = (item: any) => {
+const handleClickItem = async (item: any) => {
     isShowDiscussDetail.value = true;
     activeDiscussData.value = item;
-    console.log('当前点击的讨论', item,activeDiscussData.value);
+    getDiscussReplyListRequest(item.id)
 }
 
-//回复评论
+/*
+*   回复评论请求封装
+*   params: {discussionId: 0, replyId: 0, content: 内容}
+*/
+const replyDiscussRequest = async (content:string, parentCommentId: number, replyUserId: number) => {
+    try {
+        const params = {
+            content,
+            discussionId: activeDiscussData.value.id,
+            parentCommentId,
+            replyUserId,
+        }
+        await fetchReplyDiscuss(params);
+
+        ElMessage.success('回复成功')
+        isShowReplyInput.value = false;
+        isShoeReplyList.value = true;
+        getDiscussReplyListRequest(activeDiscussData.value.id)
+    } catch (error) {
+        console.log(error)
+    }
+}
+
+/*
+*   删除回复评论接口请求封装
+*   @params commentId：该回复的id
+*/
+const deleteReplyDiscussRequest = async (id: number) => {
+    try {
+        const params = {
+            commentId: id,
+        }
+        await fetchDeleteReplyDiscuss(params);
+        ElMessage.success('删除成功');
+        isShowReplyInput.value = false;
+        getDiscussReplyListRequest(activeDiscussData.value.id)
+    } catch (error) {
+        console.log(error)
+    }
+}
+
+//发表讨论的回复
 const inputDiscussText = ref('');
+const handleReplyDiscuss = async () => {
+    replyDiscussRequest(inputDiscussText.value,0,0);
+    inputDiscussText.value = '';
+}
+
 //二级评论是否展示
 const isShoeReplyList = ref(false);
 
-//一级回复
-const inputReplyText = ref('');  //回复输入内容
+const inputReplyText = ref('');      //一级二级评论输入内容
 const isShowReplyInput = ref(false);
 const activeReplyItemId = ref();
 
+//回复一级评论
+const handleSendReply = (item: any) => {
+    console.log(item)
+    replyDiscussRequest(inputReplyText.value, item.id, item.ownerId)
+}
+
+//删除一级评论
+const handleDeleteReply1 = (item: any) => {
+    deleteReplyDiscussRequest(item.id);
+}
+
 const handleReplyClick = (item: any) => {
     // 当前点击的一级回复id值和激活的id值相同则直接 ！  等于空是为了首次点击
+    inputReplyText.value = '';
     if(activeReplyItemId.value == item.id || activeReplyItemId.value == null) {
         isShowReplyInput.value = !isShowReplyInput.value;
         activeReplyItemId.value = item.id
@@ -253,18 +419,19 @@ const handleReplyClick = (item: any) => {
     }
 }
 
-const handleDeleteReply1 = (item: any) => {
-    //删除一级评论
-}
-
-const handleSendReply = (item: any) => {
-    //发送回复
-    console.log('回复内容',inputReplyText.value)
-}
-
 //二级评论
 const activeReplyItemListId = ref();
 const isShowReplyInputList = ref(false);
+
+//回复二级评论 
+const handleSendReply2 = (list:any,item: any) => {
+    replyDiscussRequest(inputReplyText.value, item.id, list.ownerId)
+}
+
+//删除二级评论
+const handleDeleteReply2 = (list: any)  => {
+    deleteReplyDiscussRequest(list.id)
+}
 
 const handleReplyClick2 = (list: any,item: any) => {
     // list:二级回复 item:一级回复
@@ -278,9 +445,6 @@ const handleReplyClick2 = (list: any,item: any) => {
     }
 }
 
-const handleDeleteReply2 = (list: any,item: any)  => {
-    //删除二级评论
-}
 </script>
 
 <style scoped lang="scss">
@@ -411,7 +575,7 @@ const handleDeleteReply2 = (list: any,item: any)  => {
                             .text {
                                 width: 100%;
                                 .text-text {
-                                    width: 86%;
+                                    width: 84%;
                                     color: #213547;
                                     font-size: 12px;
                                     padding: 4px 8px;
