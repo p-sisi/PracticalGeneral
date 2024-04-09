@@ -170,7 +170,9 @@ const handleClickNotice = () => {
 //点击我的课程
 const handleClickMyClass = () => {
     router.push({name: 'student_home'})
-    studentStore.setActiveHomeTab('我的课程')
+    studentStore.setActiveHomeTab('我的课程');
+
+    commonStore.setActiveHeaderMenu('首页')
 }
 
 //修改密码

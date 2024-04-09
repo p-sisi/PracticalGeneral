@@ -7,7 +7,7 @@
                 <div v-if="isShowTaskList == false">> 作业详情</div>
             </div>
             <div class="total">
-                <div>已发布&nbsp;{{ TASK_DATA.length }}</div>
+                <div>已发布&nbsp;{{ taskData.length }}</div>
                 <div style="margin-left: 8px;">未提交<span style="color: #f56c6c;">&nbsp;{{ submitCount }}</span></div>
             </div>
         </div>
@@ -16,7 +16,7 @@
         <div class="task-item" v-if="isShowTaskList == true">
             <div 
                 class="item"
-                v-for="item in TASK_DATA"
+                v-for="item in taskData"
                 :key="item.id"
                 @click="goToTaskDetail(item)"
             >
@@ -46,7 +46,7 @@
                     </div>
                 </div>
                 <div class="title-right">
-                    <div class="time">提交截止时间：{{ activeTaskData.deadline }}</div>
+                    <div class="time">提交截止时间：{{ activeTaskData.deadTime }}</div>
                     <div class="status-noSubmit" v-if="activeTaskData.commitStatus == 0 && new Date(activeTaskData.deadTime) > new Date()">未提交</div>
                     <div class="status-submit" v-else-if="activeTaskData.commitStatus == 1 && new Date(activeTaskData.deadTime) > new Date()">已提交</div>
                     <div class="status-score" v-else-if="activeTaskData.commitStatus == 2">{{ activeTaskData.score }}</div>
@@ -58,17 +58,32 @@
             <div class="content">
                 <div class="content-title">
                     <el-upload
+                        ref="uploadRef"
                         class="upload-demo"
                         drag
-                        :action="UPLOAD_URL"
-                        :on-success="handleSuccessFile"
-                        :on-error="handleErrorFile"
-                        multiple
+                        :auto-upload="false"
+                        :show-file-list="false"
+                        @change="handleChangeFile"
+                        :limit="1"
+                        :on-exceed="handleExceed"
                     >
                         <span class="iconfont icon-shangchuan"></span>
                         <div class="el-upload__text">拖拽文件到此处或者 <em>点击添加作业</em></div>
                     </el-upload>
                 </div>
+
+                <!-- 当前选择文件 -->
+                <div class="content-file" v-if="isShowUploadFile">
+                    <div class="content-file-detail">
+                        <span class="iconfont icon-wendangwenjian"></span>
+                        <div>
+                            <div>{{ uploadTaskFile.name }}</div>
+                            <div style="font-size: 10px;margin-top: 2px;">{{ (uploadTaskFile.size/1024).toFixed(2) }}k</div>
+                        </div>
+                    </div>
+                    <span style="cursor: pointer;color: #4186ff;font-size: 14px;" @click="handleDeleteUploadFile">删除</span>
+                </div>
+
                 <div class="content-tip">
                     <div style="margin: 10px;">作业备注<span style="margin-left: 10px;font-size: 10px;">（选填）</span></div>
                     <div><el-input
@@ -80,7 +95,14 @@
                     /></div>
                 </div>
                 <div class="content-submit">
-                    <el-button type="primary" round :disabled="new Date(activeTaskData.deadTime) < new Date() || activeTaskData.commitStatus == 2"> &nbsp;&nbsp;{{ activeTaskData.commitStatus !== 0 ? '更新提交' : '提交作业'}}&nbsp;&nbsp; </el-button>
+                    <el-button 
+                        type="primary" 
+                        round 
+                        :disabled="new Date(activeTaskData.deadTime) < new Date() 
+                        || activeTaskData.commitStatus == 2"
+                        @click="handleSubmitTask"
+                        > &nbsp;&nbsp;{{ activeTaskData.commitStatus !== 0 ? '更新提交' : '提交作业'}}&nbsp;&nbsp; 
+                    </el-button>
                 </div>
 
                 <!-- 提交记录 -->
@@ -90,22 +112,31 @@
                         <div>提交记录</div>
                     </div>
                     <div class="list">
-                        <div class="times">提交次数：<span>{{ TASK_SUBMIT_RECORD.length }}</span></div>
-                        <el-timeline style="max-width: 700px">
+                        <div class="times">提交次数：<span>{{ taskHistory.length }}</span></div>
+                        <div v-show="taskHistory.length == 0" class="empty">
+                            <span class="iconfont icon-zanwuxiangguanshuju"></span>
+                            <div>暂未提交</div>
+                        </div>
+                        <el-timeline style="max-width: 700px" >
                             <el-timeline-item 
-                                v-for="item in TASK_SUBMIT_RECORD"
-                                :key="item.taskId"
-                                :timestamp=" item.submitTime " 
+                                v-for="item in taskHistory"
+                                :key="item.id"
+                                :timestamp=" item.commitTime " 
                                 placement="top">
                                 <div class="list-item">
                                     <div class="list-item-info">
                                         <span class="iconfont icon-wendangwenjian"></span>
                                         <div>
-                                            <div>{{ item.fileName }}</div>
-                                            <div style="font-size: 12px;margin-top: 2px;">{{ item.fileSize }}</div>
+                                            <div>{{ item.originalFilename }}</div>
+                                            <div style="display: flex;font-size: 12px;align-items: center;">
+                                                <div style="margin: 2px 20px 0px 0px;">{{ (item.fileSize/1024).toFixed(2) }}k</div>
+                                                <el-tooltip :content="item.answerRemark" placement="bottom" effect="light">
+                                                    <span v-if="item.answerRemark != ''" style="cursor: pointer;color: #4186ff;">备注</span>
+                                                </el-tooltip>
+                                            </div>
                                         </div>
                                     </div>
-                                    <el-button plain>下载</el-button>
+                                    <el-button plain @click="handleDownLoad(item)">下载</el-button>
                                 </div>
                             </el-timeline-item>
                         </el-timeline>
@@ -117,41 +148,144 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from 'vue';
-import { TASK_DATA, TASK_SUBMIT_RECORD } from '../../content/student';
-import { ElMessage } from 'element-plus'
+import { computed, ref, onMounted, Ref } from 'vue';
+import { ElMessage, genFileId } from 'element-plus'
 import { Clock, Folder } from '@element-plus/icons-vue';
+import type { UploadInstance, UploadProps, UploadRawFile } from 'element-plus'
+import { fetchGetAllCourseTask, fetchGetTaskHistory, fetchDownloadTask } from '../../apis/modules/task';
+import { useCommonStore } from '@/store';
+import { Task, TaskDetail } from '../../content/task';
+import axios from 'axios';
 
-//文件上传的后端接口地址
-const UPLOAD_URL = 'https://run.mocky.io/v3/9d059bf9-4660-45f2-925d-ce80ad6c4d15';
+onMounted(() => {
+    getTaskDataRequest();
+})
+
+const commonStore = useCommonStore();
+
+//获取作业列表
+const taskData: Ref<Task[]> = ref([]);
+const getTaskDataRequest = async () => {
+    try {
+        const params = {
+            courseId: commonStore.activeClass.courseId
+        }
+        const result = await fetchGetAllCourseTask(params);
+        taskData.value = result.data;
+    } catch (error) {
+        ElMessage.error('获取作业列表失败！')
+    }
+}
 
 const submitCount = computed(() => {
-    return TASK_DATA.filter(item => item.isSubmit === false).length;
+    return taskData.value.filter( (item) => item.commitStatus == 0).length;
 })
 
 
 //是否展示作业列表
 const isShowTaskList = ref(true);
-const activeTaskData = ref();   //当前作业信息
+const activeTaskData = ref();   //当前作业详情信息
 
 const goToTaskDetail = (item: any) => {
     isShowTaskList.value = false;
     activeTaskData.value = item;
+
+    getTaskHistoryRequest();
+}
+
+//作业提交记录
+const taskHistory: Ref<TaskDetail[]> = ref([]);
+
+const getTaskHistoryRequest = async () => {
+    try {
+        const params = {
+            homeworkId: activeTaskData.value.id
+        }
+        const result = await fetchGetTaskHistory(params);
+        taskHistory.value = result.data;
+    } catch (error) {
+        ElMessage.error('获取作业提交记录失败！')
+    }
 }
 
 //作业
 const inputTips = ref('');
+const isShowUploadFile = ref(false);  //当前选择文件
 
-const handleSuccessFile = (response:any, file:any, fileList:any) => {
-    // 处理文件上传成功后的回调
-    console.log('上传成功', response, file, fileList);
-    ElMessage.success('上传作业成功！')
+const uploadTaskFile = ref();    //File类型的数据
+
+const handleChangeFile = (file: any, fileList: any) => {
+    isShowUploadFile.value = true;
+    // file 是当前选择的文件，可以通过 file.raw 获取原始的 File 对象,fileList是上传的文件列表
+    uploadTaskFile.value = file.raw;
+    console.log(uploadTaskFile.value)
 };
 
-const handleErrorFile = (response:any, file:any, fileList:any) => {
-    console.log('上传失败', response, file, fileList);
-    ElMessage.error('上传作业失败！')
+//删除已选择的文件
+const handleDeleteUploadFile = () => {
+    isShowUploadFile.value = false;
+    uploadTaskFile.value = null;
 }
+
+const uploadRef = ref<UploadInstance>()
+
+//选择文件超出限制时，覆盖第一个文件
+const handleExceed: UploadProps['onExceed'] = (files: any) => {
+    uploadRef.value!.clearFiles()
+    const file = files[0] as UploadRawFile
+    file.uid = genFileId()
+    uploadRef.value!.handleStart(file)
+}
+
+// 设置请求头
+const token = localStorage.getItem('Token');
+const config = {
+  headers: {
+    'Content-Type': 'multipart/form-data', // 设置Content-Type为formData类型
+    'Authorization': `${token}`, 
+  }
+}
+
+const handleSubmitTask = async () => {
+    let formData = new FormData();
+    formData.append('file', uploadTaskFile.value);
+    formData.append('answerRemark', inputTips.value);
+    formData.append('homeworkId', activeTaskData.value.id);
+
+    axios.post('http://localhost:1023/homework/commitHomework', formData, config)
+        .then((response: any) => {
+            ElMessage.success('提交成功')
+        })
+        .catch((error: any) => {
+            console.error('Error:', error);
+        });
+}
+
+const handleDownLoad = async (item: any) => {
+    try {
+        const params = {
+            fileName: item.depositFilename
+        };
+        const result = await fetchDownloadTask(params);
+
+        // // 由于Axios拦截器已经处理了Blob类型的响应，直接使用Blob URL来创建下载链接
+        // const url = window.URL.createObjectURL(result);
+
+        // // 创建a标签并设置下载属性
+        // const link = document.createElement('a');
+        // link.href = url;
+        // link.setAttribute('download', 'filename.extension'); // 设置下载的文件名及扩展名
+
+        // // 将a标签添加到页面并模拟点击下载
+        // document.body.appendChild(link);
+        // link.click();
+
+        // // 释放Blob URL资源
+        // window.URL.revokeObjectURL(url);
+    } catch (error) {
+        console.error('Error:', error);
+    }
+};
 </script>
 
 <style scoped lang="scss">
@@ -273,9 +407,31 @@ const handleErrorFile = (response:any, file:any, fileList:any) => {
             background-color: #f8fbff;
             border-radius: 10px;
             &-title {
+                margin-bottom: 10px;
                 .icon-shangchuan {
                     font-size: 54px;
                     color: #4186ff;
+                }
+            }
+            &-file {
+                display: flex;
+                align-items: flex-end;
+                gap: 10px;
+                &-detail {
+                    display: flex;
+                    gap: 6px;
+                    width: 90%;
+                    padding: 6px 10px;
+                    border: 1px solid #dcdfe6;
+                    border-radius: 4px;
+                    background-color: #fff;
+                    box-sizing: border-box;
+                    font-size: 14px;
+                    .iconfont {
+                        margin-right: 8px;
+                        font-size: 28px;
+                        color: #409eff;
+                    }
                 }
             }
             &-tip {
@@ -306,6 +462,19 @@ const handleErrorFile = (response:any, file:any, fileList:any) => {
                         span {
                             font-size: 16px;
                             font-weight: 600;
+                        }
+                    }
+                    .empty {
+                        display: flex;
+                        width: 100%;
+                        height: 100px;
+                        flex-flow: column nowrap;
+                        justify-content: center;
+                        align-items: center;
+                        color: #9c9a9a;
+                        font-size: 12px;
+                        span {
+                            font-size: 34px;
                         }
                     }
                     .list-item {

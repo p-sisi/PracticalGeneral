@@ -37,15 +37,30 @@
                 </div>
                 <div class="footer">
                     <div class="code">加课码：<span style="font-weight: 600;">{{ commonStore.activeClass.addCode }}</span></div>
-                    <el-button type="danger" @click="exitClass">退出课程</el-button>
+                    <el-button type="danger" @click="dialogVisible = true">退出课程</el-button>
                 </div>
             </div>
         </div>
+
+        <!-- 退出课堂弹窗 -->
+        <el-dialog
+            v-model="dialogVisible"
+            title="提示"
+            width="400"
+        >
+            <span>你确定要退出课程<span style="font-size: 17px;color: #4186ff;margin:0px 8px;">{{ commonStore.activeClass.courseName }}</span>?</span>
+            <template #footer>
+            <div class="dialog-footer">
+                <el-button @click="dialogVisible = false">取消</el-button>
+                <el-button type="primary" @click="exitClass" color="#4186ff">退出</el-button>
+            </div>
+            </template>
+        </el-dialog>
     </div>
 </template>
 
 <script setup lang="ts">
-import { onMounted } from 'vue';
+import { onMounted, ref } from 'vue';
 import { COURSE_MENU } from '../../content/common'
 import { useStudentStore, useCommonStore } from '@/store'
 import router from '@/router/index.ts';
@@ -66,6 +81,7 @@ const menuChange = (item: any) => {
 }
 
 //退出课堂
+const dialogVisible = ref(false);
 const exitClass = async () => {
     try {
         const params = {
@@ -82,7 +98,6 @@ const exitClass = async () => {
         
     } catch (error) {
         ElMessage.error('退出课堂失败');
-        return;
     }
 }
 </script>
