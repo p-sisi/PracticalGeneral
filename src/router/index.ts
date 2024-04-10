@@ -49,63 +49,63 @@ const routes = [
         // 学生路由
         name: 'student',   
         path: '/student',  
-        component: () => import('../views/student/Index.vue'),
+        component: () => import('../views/stu-tea/Index.vue'),
         children: [
             {
               path: 'home',
               name: 'student_home',
-              component: () => import('../views/student/Home.vue'),
+              component: () => import('../views/stu-tea/Home.vue'),
             },
             {
+                // 学生端--课程详情页路由
                 path: 'class_detail',
                 name: 'student_class_detail',
-                component: () => import('../views/student/ClassDetail.vue'),
+                component: () => import('../views/stu-tea/ClassDetail.vue'),
                 children: [
                     {
-                        // 课程详情页路由
                         path: 'resource',
                         name: 'student_resource',
-                        component: () => import('../views/student/ClassResource.vue'),
+                        component: () => import('../views/student/Resource.vue'),
                     },
                     {
                         path: 'notice',
                         name: 'student_notice',
-                        component: () => import('../views/student/ClassNotice.vue'),
+                        component: () => import('../views/student/Notice.vue'),
                     },
                     {
                         path: 'task',
                         name: 'student_task',
-                        component: () => import('../views/student/ClassTask.vue'),
+                        component: () => import('../views/student/Task.vue'),
                     },
                     {
                         path: 'discuss',
                         name: 'student_discuss',
-                        component: () => import('../views/student/ClassDiscuss.vue'),
+                        component: () => import('../views/student/Discuss.vue'),
                     },
                     {
                         path: 'analyze',
                         name: 'student_analyze',
-                        component: () => import('../views/student/ClassAnalyze.vue'),
+                        component: () => import('../views/student/Analyze.vue'),
                     },
                     {
                         path: 'check_in',
                         name: 'student_check_in',
-                        component: () => import('../views/student/ClassCheckIn.vue'),
+                        component: () => import('../views/student/CheckIn.vue'),
                     },
                     {
                         path: 'reply',
                         name: 'student_reply',
-                        component: () => import('../views/student/ClassReply.vue'),
+                        component: () => import('../views/student/Reply.vue'),
                     },
                     {
                         path: 'member',
                         name: 'student_member',
-                        component: () => import('../views/student/ClassMember.vue'),
+                        component: () => import('../views/student/Member.vue'),
                     },
                     {
                         path: 'survey',
                         name: 'student_survey',
-                        component: () => import('../views/student/ClassSurvey.vue'),
+                        component: () => import('../views/student/Survey.vue'),
                     },
                     
                 ]
@@ -116,63 +116,63 @@ const routes = [
         // 教师路由
         name: 'teacher',   
         path: '/teacher',  
-        component: () => import('../views/teacher/Index.vue') ,
+        component: () => import('../views/stu-tea/Index.vue'),
         children: [
             {
               path: 'index',
               name: 'teacher_index',
-              component: () => import('../views/teacher/Home.vue'),
+              component: () => import('../views/stu-tea/Home.vue'),
             },
             {
+                // 教师端----课程详情页路由
                 path: 'class_detail',
                 name: 'teacher_class_detail',
-                component: () => import('../views/teacher/ClassDetail.vue'),
+                component: () => import('../views/stu-tea/ClassDetail.vue'),
                 children: [
                     {
-                        // 课程详情页路由
                         path: 'resource',
                         name: 'teacher_resource',
-                        component: () => import('../views/teacher/DetailResource.vue'),
+                        component: () => import('../views/teacher/Resource.vue'),
                     },
                     {
                         path: 'notice',
                         name: 'teacher_notice',
-                        component: () => import('../views/student/ClassNotice.vue'),
+                        component: () => import('../views/teacher/Notice.vue'),
                     },
                     {
                         path: 'task',
                         name: 'teacher_task',
-                        component: () => import('../views/student/ClassTask.vue'),
+                        component: () => import('../views/teacher/Task.vue'),
                     },
                     {
                         path: 'discuss',
                         name: 'teacher_discuss',
-                        component: () => import('../views/student/ClassDiscuss.vue'),
+                        component: () => import('../views/teacher/Discuss.vue'),
                     },
                     {
                         path: 'analyze',
                         name: 'teacher_analyze',
-                        component: () => import('../views/student/ClassAnalyze.vue'),
+                        component: () => import('../views/teacher/Analyze.vue'),
                     },
                     {
                         path: 'check_in',
                         name: 'teacher_check_in',
-                        component: () => import('../views/student/ClassCheckIn.vue'),
+                        component: () => import('../views/teacher/CheckIn.vue'),
                     },
                     {
                         path: 'reply',
                         name: 'teacher_reply',
-                        component: () => import('../views/student/ClassReply.vue'),
+                        component: () => import('../views/teacher/Reply.vue'),
                     },
                     {
                         path: 'member',
                         name: 'teacher_member',
-                        component: () => import('../views/student/ClassMember.vue'),
+                        component: () => import('../views/teacher/Member.vue'),
                     },
                     {
                         path: 'survey',
                         name: 'teacher_survey',
-                        component: () => import('../views/student/ClassSurvey.vue'),
+                        component: () => import('../views/teacher/Survey.vue'),
                     },
                     
                 ]

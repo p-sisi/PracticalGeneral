@@ -1,6 +1,6 @@
 <template>
     <div>
-        课程详情
+        答辩
     </div>
 </template>
 
@@ -8,6 +8,6 @@
 
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 
 </style>

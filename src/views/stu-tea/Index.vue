@@ -64,7 +64,7 @@
         </el-affix>
 
         <div class="body">
-            <!-- 学生端路由出口 -->
+            <!-- 学生端、教师端子路由出口 -->
             <router-view></router-view>
         </div>
 
