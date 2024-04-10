@@ -42,6 +42,9 @@ export const useCommonStore = defineStore("common",{
         addHeaderMenu(menu: string) {
             this.headerMenu.push(menu);
         },
+        setHeaderMenu(menu: string[]) {
+            this.headerMenu = menu;
+        },
         setActiveClass(course: Course) {
             this.activeClass = course;
         },
