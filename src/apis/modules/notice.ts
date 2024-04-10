@@ -10,6 +10,14 @@ export function fetchGetAllCourseNotice() {
 }
 
 /**
+ * 获取所单个课程公告
+
+ */
+export function fetchGetCourseNotice(params: object) {
+    return request.get('/notice/getOneCourseNotice', params);
+}
+
+/**
  * 获取所有系统公告
  */
 export function fetchGetAllSysNotice() {

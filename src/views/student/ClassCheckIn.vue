@@ -3,27 +3,27 @@
         <!-- 统计 -->
         <div class="check-header">
             <div class="item">
-                <div>10</div>
+                <div>{{ checkTotal.all }}</div>
                 <span>签到数</span>
             </div>
             <div class="divide"></div>
             <div class="item">
-                <div style="color: #67c23a;">7</div>
+                <div style="color: #67c23a;">{{ checkTotal.CHU }}</div>
                 <span>出勤</span>
             </div>
             <div class="divide"></div>
             <div class="item">
-                <div style="color:#f56c6c;">1</div>
+                <div style="color:#f56c6c;">{{ checkTotal.QUE }}</div>
                 <span>缺勤</span>
             </div>
             <div class="divide"></div>
             <div class="item">
-                <div style="color:#ffc921;">1</div>
+                <div style="color:#ffc921;">{{ checkTotal.CHI }}</div>
                 <span>迟到</span>
             </div>
             <div class="divide"></div>
             <div class="item">
-                <div style="color:#ffc921;">1</div>
+                <div style="color:#ffc921;">{{ checkTotal.QIN }}</div>
                 <span>请假</span>
             </div>
         </div>
@@ -41,24 +41,24 @@
             </div>
             <div 
                 class="item" 
-                v-for="item in STUDENT_SIGN_IN_DATA" 
+                v-for="item in checkListData" 
                 :key="item.id"
-                :class="{'isChu': item.status == 1,'isQue' : item.status == 0,'isChi':item.status == 2,'isQin': item.status == 3}">
+                :class="{'isChu': item.mySignStatus == 1,'isQue' : item.mySignStatus == 0,'isChi':item.mySignStatus == 3,'isQin': item.mySignStatus == 2}">
                 <div class="item-info">
                     <div>{{ item.title }}</div>
-                    <span>签到类型：{{ item.type == 1 ? '数字签到' : '按钮签到' }}</span>
+                    <span>签到类型：{{ item.signType == 1 ? '数字签到' : '按钮签到' }}</span>
                     <span>发起：{{ item.createTime }}</span>
-                    <span>截止：{{ item.endTime }}</span>
-                    <span v-if="item.status !== 1">未签到</span>
+                    <span>截止：{{ item.deadTime }}</span>
+                    <span v-if="item.mySignStatus !== 1">未签到</span>
                     <!-- 只有出勤才显示签到时间 -->
                     <span v-else>签到：{{ item.signTime }}</span>
                 </div>
                 <div class="item-status">
-                    <span v-if="item.status == 1" style="color:#67c23a;">出勤</span>
-                    <span v-else-if="item.status == 0" style="color:#f56c6c;">缺勤</span>
-                    <span v-else-if="item.status == 2" style="color:#ffc921;">迟到</span>
-                    <el-button type="success" round v-else-if="item.status == 4" @click="handleCheck(item)">签到</el-button>
-                    <span v-else style="color:#ffc921;">请假</span>
+                    <span v-if="item.mySignStatus == 1" style="color:#67c23a;">出勤</span>
+                    <span v-else-if="item.mySignStatus == 2" style="color:#ffc921;">请假</span>
+                    <span v-else-if="item.mySignStatus == 3" style="color:#ffc921;">迟到</span>
+                    <span v-else-if="item.mySignStatus == 0 && new Date(item.deadTime) < new Date()" style="color:#f56c6c;">缺勤</span>
+                    <el-button type="success" round v-else-if="item.mySignStatus == 0 && new Date(item.deadTime) > new Date()" @click="handleCheckByBtn(item)">签到</el-button>
                 </div>
             </div>
         </div>
@@ -72,44 +72,101 @@
                 <el-input ref="inputCount4Ref" v-model="inputCount4" size="large" maxlength="1" @input="handleInput4"/>
             </div>
             <div style="margin: 20px 0px 20px 42%;">
-                <el-button type="success" round  @click="handleCheckIn(item)">签 到</el-button>
+                <el-button type="success" round  @click="handleCheckByCode()">签 到</el-button>
             </div>
         </el-dialog>
     </div>
 </template>
 
 <script setup lang="ts">
-import { ref, } from 'vue';
-import { STUDENT_SIGN_IN_DATA } from '../../content/student'
+import { ref, onMounted, Ref, computed } from 'vue';
 import { Loading } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus';
+import { fetchGetAllCheck, fetchCheck } from '../../apis/modules/check';
+import { Check } from '../../content/check';
+import { useCommonStore } from '@/store';
 
+onMounted(() => {
+    getCheckListRequest();
+})
 
-const isRefreshLoading = ref(false);
+const commonStore = useCommonStore();
 
-const handleRefresh = () => {
-    if(isRefreshLoading.value == true) return
-    //TODO:刷新，重新请求签到
+const checkListData: Ref<Check[]> = ref([]);
 
+/*
+*   获取签到列表
+*/
+const getCheckListRequest = async () => {
+    try {
+        const params = {
+            courseId: commonStore.activeClass.courseId
+        }
+        const result = await fetchGetAllCheck(params);
+        checkListData.value = result.data;
 
-    //刷新结束
-    isRefreshLoading.value = true;
+        //结束刷新
+        isRefreshLoading.value = false;
+    } catch (error) {
+        console.log(error)
+    }
 }
 
-const dialogTableVisible = ref(false);
-const checkTitle = ref('');
+//签到情况统计
+const checkTotal = computed(()=> {
+    return {
+        all: checkListData.value.length,  //签到总数
+        CHU: checkListData.value.filter((item:any) => item.mySignStatus == 1).length,  //出勤
+        QUE: checkListData.value.filter((item:any) => item.mySignStatus == 0).length,  //缺勤
+        QIN: checkListData.value.filter((item:any) => item.mySignStatus == 2).length,  //请假
+        CHI: checkListData.value.filter((item:any) => item.mySignStatus == 3).length,  //迟到
+    }
+})
 
-//签到
-const handleCheck = (item: any) => {
-    if(item.type == '按钮签到') {
-        ElMessage.success('用签到成功');
-        //重新请求签到列表
+//刷新
+const isRefreshLoading = ref(false);
+const handleRefresh = () => {
+    if(isRefreshLoading.value == true) return
+    isRefreshLoading.value = true;
+    getCheckListRequest();
+    ElMessage.success('刷新成功');
+}
+
+
+/*
+*   签到请求封装
+*   @param attendanceId 签到id  singCode 签到码
+*/
+const CheckRequest = async (attendanceId: number, singCode: number) => {
+    try {
+        const params = {
+            attendanceId,
+            singCode
+        }
+        await fetchCheck(params);
+        ElMessage.success('签到成功')
+        getCheckListRequest();
+    } catch (error: any) {
+        ElMessage.error(error)
+    }
+}
+
+const checkTitle = ref('');   //弹窗标题
+const checkId = ref();    //点击的签到id
+const dialogTableVisible = ref(false);
+
+//点击“签到”按钮
+const handleCheckByBtn = (item: any) => {
+    console.log(item)
+    if(item.signType == 0) {
+        //按钮签到
+        CheckRequest(item.id,0);
         return 
     }
-
+    //数字签到
     dialogTableVisible.value = true;
     checkTitle.value = item.title;
-
+    checkId.value = item.id;
 }
 
 const inputCount1 = ref();
@@ -139,12 +196,13 @@ const handleInput3 = (value:any) => {
 const handleInput4 = (value:any) => {
     if(value.length == 1) {
         inputCount4Ref.value.blur();
-        handleCheckIn();
     }
 }
 
-const handleCheckIn = () => {
-    
+const handleCheckByCode = () => {
+    const code = parseInt(inputCount1.value + inputCount2.value + inputCount3.value + inputCount4.value);
+    console.log(code,typeof code)
+    CheckRequest(checkId.value,code);
 }
 
 const handleDialogClose = () => {

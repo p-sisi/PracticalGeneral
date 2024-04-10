@@ -1,3 +1,6 @@
+//后端域名,更换ip地址
+export const BASE_ERL = 'http://10.33.12.200:8081/';
+
 //用户类型
 export const USER_TYPE = [
     {

@@ -71,7 +71,7 @@
         <!-- 评论详情 -->
         <div class="discuss-detail" v-if="isShowDiscussDetail == true">
             <div class="header">
-                <div class="back" @click="isShowDiscussDetail = false">
+                <div class="back" @click="handleBack">
                     <el-icon><ArrowLeftBold /></el-icon>
                     <div>返回评论列表</div>
                 </div>
@@ -103,8 +103,8 @@
 
                         <!-- 一级回复列表 -->
                         <div style="display: flex;width: 100%;">
-                            <!-- TODO: 封装请求地址 -->
-                            <el-avatar :src="`http://10.33.18.17:8081/file/images/${item.ownerHeadImg}`"> user </el-avatar>
+                            <el-avatar v-if="item.ownerHeadImg != null" :src="`${BASE_ERL}file/images/${item.ownerHeadImg}`"> user </el-avatar>
+                            <el-avatar v-else> user </el-avatar>
                             <div style="margin-left: 10px;width: 100%;">
                                 <div style="color: #999;font-size: 12px;">
                                     <span style="margin-right: 10px;">{{ item.ownerName }}</span>
@@ -201,7 +201,7 @@ import { Search, Plus, ArrowLeftBold, ArrowDown, ArrowUp, Position, InfoFilled }
 import type { FormRules, FormInstance } from 'element-plus';
 import { ElMessage } from 'element-plus'
 import { Discuss, Discuss_First_Reply } from '../../content/discuss'
-import { DISCUSS_LIST_DATA, DISCUSS_REPLY_LIST_DATA } from '../../content/student';
+import { BASE_ERL } from '../../content/common';
 import { fetchDiscussByCourseId, fetchDiscussComment, fetchNewDiscuss, fetchReplyDiscuss, fetchDeleteReplyDiscuss } from '../../apis/modules/discuss';
 import { useCommonStore } from '@/store';
 
@@ -213,6 +213,14 @@ const commonStore = useCommonStore();
 
 const discussListData: Ref<Discuss[]> = ref([]);
 const discussListDataAll: Ref<Discuss[]> = ref([]);
+
+//返回讨论列表
+const isShowDiscussDetail = ref(false);   //是否展示讨论详情
+const handleBack = () => {
+    isShowDiscussDetail.value = false;
+    isShoeReplyList.value = false;
+    getDiscussListRequest();
+}
 
 //获取讨论列表
 const getDiscussListRequest = async () => {
@@ -241,7 +249,6 @@ const getDiscussReplyListRequest = async (id: number) => {
     }
 }
 
-const isShowDiscussDetail = ref(false);
 
 //讨论排序类型切换
 const activeTab = ref('全部评论');
