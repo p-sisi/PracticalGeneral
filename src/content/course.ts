@@ -7,6 +7,6 @@ export interface Course {
     createTime: string;   //创建时间
     isOver: boolean;      //是否结课
     stuNum: number;       //学生总人数
-    teacherHeadImg: string; //教师头像
-    teacherName: string;    //教师名称
+    teacherHeadImg: any; //教师头像
+    teacherName: any;    //教师名称
 }

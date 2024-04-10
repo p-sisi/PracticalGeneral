@@ -54,7 +54,7 @@ const routes = [
             {
               path: 'home',
               name: 'student_home',
-              component: () => import('../views/stu-tea/Home.vue'),
+              component: () => import('../views/stu-tea/IndexBody.vue'),
             },
             {
                 // 学生端--课程详情页路由
@@ -121,7 +121,7 @@ const routes = [
             {
               path: 'index',
               name: 'teacher_index',
-              component: () => import('../views/stu-tea/Home.vue'),
+              component: () => import('../views/stu-tea/IndexBody.vue'),
             },
             {
                 // 教师端----课程详情页路由

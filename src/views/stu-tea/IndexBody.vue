@@ -64,12 +64,21 @@
                         <div class="name">{{ item.courseName }}</div>
                         <el-image style="width: 100%; height: 180px" src="https://fuss10.elemecdn.com/e/5d/4a731a90594a4af544c0c25941171jpeg.jpeg" fit="fit" />
                         <div class="user">
+
+                            <!-- 学生端不展示课号及创建时间 -->
+                            <div v-show="commonStore.userType == '教师'">
+                                <span style="font-size: 12px;">课号：{{ item.courseNumber }}</span>
+                            </div>
+
                             <span v-if="item.isOver == false" style="color:#529949">进行中...</span>
                             <span v-else style="color: #ccc;">已结束</span>
-                            <div class="user-detail">
+
+                            <!-- 教师端不展示教师头像及姓名 -->
+                            <div v-show="commonStore.userType == '学生'" class="user-detail" >
                                 <el-avatar size="small" src="https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png" />
                                 <span>{{ item.teacherName }}</span>
                             </div>
+
                         </div>
                     </div>
                     <div v-else class="list-empty">
@@ -145,7 +154,7 @@ import { Notice } from '../../content/notice';
 import { useStudentStore, useCommonStore } from '@/store'
 import router from '@/router/index.ts';
 import { fetchGetAllCourseNotice, fetchGetAllSysNotice, fetchReadNotice } from '../../apis/modules/notice';
-import { fetchGetAllCourseStudent, fetchAddCourse } from '../../apis/modules/course';
+import { fetchGetAllCourseStudent, fetchGetAllCourseTeacher, fetchAddCourse } from '../../apis/modules/course';
 
 const studentStore = useStudentStore();
 const commonStore = useCommonStore();
@@ -183,7 +192,13 @@ const courseData: Ref<Course[]> = ref([]);  //处理后的课程列表
 const courseDataAll: Ref<Course[]> = ref([]);  //所有课程列表
 const getClassListRequest = async () => {
     try {
-        const result = await fetchGetAllCourseStudent();
+        let result: any;
+        if(commonStore.userType == '教师') {
+            result = await fetchGetAllCourseTeacher();
+        }else {
+            result = await fetchGetAllCourseStudent();
+        }
+        console.log(result.data)
         courseData.value = result.data;
         courseDataAll.value = result.data;
 
@@ -316,7 +331,7 @@ const handleSearch = () => {
     courseData.value = courseData.value.filter((item:any) => {
         return (
             item.courseName.includes(searchClassValue.value) || 
-            item.teacherName.includes(searchClassValue.value)  
+            item.teacherName?.includes(searchClassValue.value)  
         )
     });
 }

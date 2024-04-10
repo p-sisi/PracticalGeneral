@@ -3,10 +3,17 @@
 import request from '../request';
 
 /**
- * 学生获取全部课程
+ * 学生端---获取全部课程
  */
 export function fetchGetAllCourseStudent() {
     return request.get('/course/stuGetAllCourse');
+}
+
+/**
+ * 教师端---获取全部课程
+ */
+export function fetchGetAllCourseTeacher() {
+    return request.get('/course/tchGetAllCourse');
 }
 
 /**
