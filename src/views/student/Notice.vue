@@ -42,7 +42,7 @@
 import { ref, onMounted, Ref } from 'vue';
 import { Loading } from '@element-plus/icons-vue';
 import { ElMessage } from 'element-plus';
-import { fetchGetCourseNotice, fetchReadNotice } from '../../apis/modules/notice';
+import { fetchGetCourseNoticeStudent, fetchReadNotice } from '../../apis/modules/notice';
 import { Notice } from '../../content/notice';
 import { useCommonStore } from '@/store';
 
@@ -59,7 +59,7 @@ const getCourseDataRequest = async () => {
         const params = {
             courseId: commonStore.activeClass.courseId
         }
-        const result = await fetchGetCourseNotice(params);
+        const result = await fetchGetCourseNoticeStudent(params);
         courseNoticeData.value = result.data;
     } catch (error) {
         ElMessage.error('获取公告失败，请稍候再试！');

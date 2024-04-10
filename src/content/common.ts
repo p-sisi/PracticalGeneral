@@ -17,8 +17,8 @@ export const USER_TYPE = [
     }
 ]
 
-//课程详情页菜单
-export const COURSE_MENU = [
+//学生端---课程详情页菜单
+export const COURSE_MENU_STU = [
     {
         label: '课程资源',
         name: 'course',
@@ -63,5 +63,54 @@ export const COURSE_MENU = [
         label: '问卷调查',
         name: 'survey',
         routeName: 'student_survey'
+    }
+]
+
+//教师端---课程详情页菜单
+export const COURSE_MENU_TCH = [
+    {
+        label: '课程资源',
+        name: 'course',
+        routeName: 'teacher_resource'
+    },
+    {
+        label: '课程公告',
+        name: 'notice',
+        routeName: 'teacher_notice'
+    },
+    {
+        label: '作业管理',
+        name: 'task',
+        routeName: 'teacher_task'
+    },
+    {
+        label: '学生管理',
+        name: 'member',
+        routeName: 'teacher_member'
+    },
+    {
+        label: '讨论',
+        name: 'discuss',
+        routeName: 'teacher_discuss'
+    },
+    {
+        label: '学情分析',
+        name: 'analysis',
+        routeName: 'teacher_analyze'
+    },
+    {
+        label: '考勤管理',
+        name: 'check_in',
+        routeName: 'teacher_check_in'
+    },
+    {
+        label: '答辩',
+        name: 'reply',
+        routeName: 'teacher_reply'
+    },
+    {
+        label: '问卷调查',
+        name: 'survey',
+        routeName: 'teacher_survey'
     }
 ]

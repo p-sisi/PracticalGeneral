@@ -4,7 +4,7 @@
         <el-affix :offset="76">
             <div class="container-menu">
                 <div class="menuList"
-                    v-for="item in COURSE_MENU"
+                    v-for="item in menuList"
                     @click="menuChange(item)" 
                     :class="{ 'selectedMenu': item.label === studentStore.activeClassMenu }">{{ item.label }}</div>
             </div>
@@ -26,11 +26,14 @@
                 </div>
                 <div class="title">{{ commonStore.activeClass.courseName }}</div>
                 <div class="time">课号：{{ commonStore.activeClass.courseNumber }}</div>
-                <div class="time">开课时间：{{ commonStore.activeClass.createTime  }}</div>
-                <div class="teacher">
+                <div class="time">开课时间：{{ (commonStore.activeClass.createTime).split(' ')[0]  }}</div>
+
+                <!-- 教师端不展示教师名称及头像 -->
+                <div class="teacher" v-show="commonStore.userType == '学生'">
                     <el-avatar> teach </el-avatar>
                     <div>{{ commonStore.activeClass.teacherName }}</div>
                 </div>
+
                 <div class="student">
                     <span class="iconfont icon-yonghu2"></span>
                     <div>学生<span style="font-weight: 600;">&nbsp;{{ commonStore.activeClass.stuNum }}&nbsp;</span>人</div>
@@ -60,8 +63,8 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref } from 'vue';
-import { COURSE_MENU } from '../../content/common'
+import { onMounted, ref, computed } from 'vue';
+import { COURSE_MENU_STU, COURSE_MENU_TCH } from '../../content/common'
 import { useStudentStore, useCommonStore } from '@/store'
 import router from '@/router/index.ts';
 import { fetchExitCourseByStudent } from '../../apis/modules/course';
@@ -72,6 +75,10 @@ const commonStore = useCommonStore();
 
 onMounted(() => {
     //获取公告内容
+})
+
+const menuList = computed(() => {
+    return commonStore.userType == '教师' ? COURSE_MENU_TCH : COURSE_MENU_STU;
 })
 
 const menuChange = (item: any) => {
@@ -108,7 +115,6 @@ const exitClass = async () => {
         float: left;
         width: 140px;
         height: 80px;
-        margin-top: 20px;
         margin-left: 20px;
         color: #fff;
         .menuList {

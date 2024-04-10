@@ -10,11 +10,19 @@ export function fetchGetAllCourseNotice() {
 }
 
 /**
- * 获取所单个课程公告
+ * 获取所单个课程公告--学生端
 
  */
-export function fetchGetCourseNotice(params: object) {
+export function fetchGetCourseNoticeStudent(params: object) {
     return request.get('/notice/getOneCourseNotice', params);
+}
+
+/**
+ * 获取所单个课程公告--教师端
+
+ */
+export function fetchGetCourseNoticeTeacher(params: object) {
+    return request.get('/notice/tchGetCourseNotice', params);
 }
 
 /**
@@ -29,4 +37,41 @@ export function fetchGetAllSysNotice() {
  */
 export function fetchReadNotice(params: object) {
     return request.get('/notice/setNoticeIsRead',params);
+}
+
+/**
+ * 删除公告
+ */
+export function fetchDeleteNotice(params: object) {
+    return request.get('/notice/deleteNotice', params);
+}
+
+
+/**
+ * 编辑公告
+ */
+export function fetchEditNotice(params: object) {
+    return request.post('/notice/updateNotice', params);
+}
+
+/**
+ * 新增课程公告
+ */
+export function fetchNewCourseNotice(params: object) {
+    return request.post('/notice/newCourseNotice', params);
+}
+
+/**
+ * 置顶公告
+ */
+export function fetchTopNotice(params: object) {
+    return request.get('/notice/setTopNotice', params);
+}
+
+
+/**
+ * 取消置顶公告
+ */
+export function fetchCancelTopNotice(params: object) {
+    return request.get('/notice/cancelTopNotice', params);
 }
