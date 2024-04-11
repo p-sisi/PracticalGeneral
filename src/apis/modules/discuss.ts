@@ -17,12 +17,18 @@ export function fetchDiscussComment(params: any) {
 }
 
 /**
- * 发起评论
+ * 发起讨论
  */
 export function fetchNewDiscuss(params: any) {
     return request.post('/discussion/newDiscussion', params);
 }
 
+/**
+ * 删除讨论
+ */
+export function fetchDeleteDiscuss(params: any) {
+    return request.get('/discussion/delete', params);
+}
 
 /**
  * 回复评论（一级二级）

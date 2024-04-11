@@ -6,7 +6,7 @@
             <div style="display: flex;">
                 <div 
                     class="tab" 
-                    v-for="value in ['全部评论','时间排序','热度优先']" 
+                    v-for="value in ['全部讨论','时间排序','热度优先','我的讨论']" 
                     :class="{'isActive': activeTab === value}"
                      @click="changeTab(value)">{{ value }}</div>
                 <div style="font-size: 12px;margin: 4px 0px 0px 10px; ">共{{ discussListData.length }}个讨论</div>
@@ -27,7 +27,7 @@
 
         <!-- 讨论列表 -->
         <div class="discuss-list">
-            <div class="item" v-for="item in discussListData" :key="item.id" @click="handleClickItem(item)">
+            <div class="item" v-for="item in discussListData" :key="item.id">
                 <div style="display: flex;gap: 20px;align-items: center;">
                     <div> <el-avatar :size="50"> user </el-avatar></div>
                     <div class="item-text">
@@ -36,11 +36,18 @@
                             <div class="name">发起者：{{ item.creatorName }}</div>
                             <div class="icon"><span class="iconfont icon-icon-"></span>{{ item.viewNum }}</div>
                             <div class="icon"><span class="iconfont icon-huifu"></span>{{ item.commentNum }}</div>
+                            <div class="icon delete" v-show="commonStore.userInfo.userId == item.creatorId">
+                                <el-popconfirm title="确定删除该讨论?" @confirm="handleDeleteDiscuss(item)">
+                                    <template #reference>
+                                        <el-icon><Delete /></el-icon>
+                                    </template>
+                                </el-popconfirm>
+                            </div>
                             <div class="time">{{ item.createTime }}</div>
                         </div>
                     </div>
                 </div>
-                <div class="item-btn">查看详情</div>
+                <div class="item-btn" @click="handleClickItem(item)">查看详情</div>
             </div>
         </div>
         </div>
@@ -82,11 +89,17 @@
             <div class="body">
                 <div class="publisher">
                     <div style="font-size: 24px;font-weight: 600;">{{ activeDiscussData.title }}</div>
-                    <div style="display: flex;gap: 20px;font-size: 12px;align-items: center;margin-top: 4px;">
-                        <span style="font-size: 14px;">发起者：{{ activeDiscussData.creatorName }}</span>
-                        <div style="color: #999;"><span class="iconfont icon-icon-"></span>{{ activeDiscussData.viewNum }}</div>
-                        <div style="color: #999;"><span class="iconfont icon-huifu"></span>{{ activeDiscussData.commentNum }}</div>
-                        <div style="color: #999;margin-left: 100px;">{{ activeDiscussData.createTime }}</div>
+                    <div style="display: flex;font-size: 12px;align-items: center;margin-top: 4px;justify-content: space-between;margin-right: 20px;">
+                        <div style="display: flex;gap: 20px;">
+                            <span style="font-size: 14px;">发起者：{{ activeDiscussData.creatorName }}</span>
+                            <div style="color: #999;"><span class="iconfont icon-icon-"></span>{{ activeDiscussData.viewNum }}</div>
+                            <div style="color: #999;"><span class="iconfont icon-huifu"></span>&nbsp;{{ activeDiscussData.commentNum }}</div>
+                            <div style="color: #999;margin-left: 100px;">{{ activeDiscussData.createTime }}</div>
+                        </div>
+                       
+                        <div v-show="activeDiscussData.creatorId ==  commonStore.userInfo.userId">
+                            <el-button type="danger" size="small" @click="deleteDialogVisible = true">删除</el-button>
+                        </div>
                     </div>
                 </div>
                 <div class="content">{{ activeDiscussData.content }}</div>
@@ -192,17 +205,33 @@
 
             </div>
         </div>
+
+        <!-- 删除讨论对话框 -->
+        <el-dialog
+            v-model="deleteDialogVisible"
+            title="提示"
+            width="400"
+        >
+            <span style="font-size: 16px;">确定删除该评论？</span>
+            <span>删除后将无法恢复</span>
+            <template #footer>
+            <div class="dialog-footer">
+                <el-button @click="deleteDialogVisible = false">取消</el-button>
+                <el-button type="primary" @click="handleDeleteDiscuss(activeDiscussData)" color="#4186ff">删除</el-button>
+            </div>
+            </template>
+        </el-dialog>
     </div>
 </template>
 
 <script setup lang="ts">
 import { ref,reactive, Ref, onMounted } from 'vue';
-import { Search, Plus, ArrowLeftBold, ArrowDown, ArrowUp, Position, InfoFilled } from '@element-plus/icons-vue'
+import { Search, Plus, ArrowLeftBold, ArrowDown, ArrowUp, Position, InfoFilled, Delete } from '@element-plus/icons-vue'
 import type { FormRules, FormInstance } from 'element-plus';
 import { ElMessage } from 'element-plus'
 import { Discuss, Discuss_First_Reply } from '../../content/discuss'
 import { BASE_ERL } from '../../content/common';
-import { fetchDiscussByCourseId, fetchDiscussComment, fetchNewDiscuss, fetchReplyDiscuss, fetchDeleteReplyDiscuss } from '../../apis/modules/discuss';
+import { fetchDiscussByCourseId, fetchDiscussComment, fetchNewDiscuss, fetchReplyDiscuss, fetchDeleteReplyDiscuss, fetchDeleteDiscuss } from '../../apis/modules/discuss';
 import { useCommonStore } from '@/store';
 
 onMounted(() => {
@@ -213,6 +242,27 @@ const commonStore = useCommonStore();
 
 const discussListData: Ref<Discuss[]> = ref([]);
 const discussListDataAll: Ref<Discuss[]> = ref([]);
+
+/*
+*   删除讨论请求
+*/
+const handleDeleteDiscuss = async (item: any) => {
+    try {
+        const params = {
+            discussionId: item.id
+        }
+        await fetchDeleteDiscuss(params)
+        ElMessage.success('删除成功')
+
+        deleteDialogVisible.value = false;
+        isShowDiscussDetail.value = false;
+        getDiscussListRequest();
+    } catch (error: any) {
+        console.log(error)
+    }
+}
+
+const deleteDialogVisible = ref(false);
 
 //返回讨论列表
 const isShowDiscussDetail = ref(false);   //是否展示讨论详情
@@ -251,18 +301,20 @@ const getDiscussReplyListRequest = async (id: number) => {
 
 
 //讨论排序类型切换
-const activeTab = ref('全部评论');
+const activeTab = ref('全部讨论');
 const changeTab = (label: any) => {
     if (activeTab.value === label )  return 
     activeTab.value = label;
     if(activeTab.value === '时间排序') {
-        discussListData.value = discussListDataAll.value.sort((a:any, b:any) => {
+        discussListData.value = discussListData.value.sort((a:any, b:any) => {
             return new Date(a.createTime).getTime() - new Date(b.createTime).getTime();
         })
     } else if(activeTab.value === '热度优先') {
-        discussListData.value = discussListDataAll.value.sort((a:any, b:any) => {
+        discussListData.value = discussListData.value.sort((a:any, b:any) => {
             return b.hotDegree - a.hotDegree;
         })
+    }else if(activeTab.value == '我的讨论'){
+        discussListData.value = discussListData.value.filter((item:any) => commonStore.userInfo.userId == item.creatorId)
     }else {
         return getDiscussListRequest();
     }
@@ -301,6 +353,10 @@ const rulesForm = reactive<FormRules>({
     ]
 })
 
+/*
+*   进行表单验证，表单验证通过
+*   发起讨论请求
+*/
 const submitForm = async (formEl: FormInstance | undefined) => {
     if (!formEl) return
     await formEl.validate(async (valid:any, fields:any) => {
@@ -312,9 +368,13 @@ const submitForm = async (formEl: FormInstance | undefined) => {
                     title: newDiscussFromData.title,
                 }
                 await fetchNewDiscuss(params);
-                newDiscussDrawer.value = false;
                 ElMessage.success('发起讨论成功')
 
+                newDiscussDrawer.value = false;
+                inputSearch.value = '';
+                activeTab.value = '全部讨论'
+                formEl.resetFields();
+                
                 getDiscussListRequest();
             } catch (error) {
                 console.log(error)
@@ -506,6 +566,12 @@ const handleReplyClick2 = (list: any,item: any) => {
                         span {
                             margin-right: 2px;
                         }
+                    }
+                    .delete {
+                        margin-top: 4px;
+                    }
+                    .delete:hover {
+                        color: #4186ff;
                     }
                     .time {
                         margin-left: 160px;

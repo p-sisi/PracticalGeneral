@@ -4,6 +4,7 @@ export interface Discuss {
     content: string;   //内容
     title: string;    //标题
     createTime: string;        //发布时间
+    creatorId: number;       //发布者id
     creatorHeadImg: any;    //发布者头像
     creatorName: string;       //发布者名称
     hotDegree: number;         //热度
