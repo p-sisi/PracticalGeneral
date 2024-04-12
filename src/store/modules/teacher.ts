@@ -1,4 +1,5 @@
 import { defineStore } from 'pinia'
+import { Task_Tech_Commit } from '../../content/task'
 
 export interface TeacherState{
     homeHeaderMenuList: Array<any>;    //首页头部菜单列表
@@ -6,6 +7,9 @@ export interface TeacherState{
     activeHomeLeftTab: string;         //当前激活首页左部菜单
     teacherInfo: object;    //教师信息
     activeClass: object;    //当前激活课程信息
+    activeTask: object;    //当前激活作业信息
+    activeStudentTask: Task_Tech_Commit;    //当前激活学生作业信息
+    breadNum: number;    //面包屑数量
 }
 
 export const useTeacherStore = defineStore("teacher",{
@@ -17,6 +21,9 @@ export const useTeacherStore = defineStore("teacher",{
         },
         activeHomeLeftTab: '我的教学',
         activeClass:{},
+        activeTask: {},
+        breadNum: 1,
+        activeStudentTask: {} as Task_Tech_Commit,
     }),
     actions:{
         addHomeHeaderMenuList(tab:string) {
@@ -33,6 +40,15 @@ export const useTeacherStore = defineStore("teacher",{
         },
         setActiveClass(classItem:Object) {
             this.activeClass = classItem;
+        },
+        setActiveTask(taskItem:Object) {
+            this.activeTask = taskItem;
+        },
+        setBreadNum(num:number) {
+            this.breadNum = num;
+        },
+        setActiveStudentTask(taskItem:Task_Tech_Commit) {
+            this.activeStudentTask = taskItem;
         }
     },
     persist: [

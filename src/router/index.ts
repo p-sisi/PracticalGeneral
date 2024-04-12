@@ -139,10 +139,29 @@ const routes = [
                         name: 'teacher_notice',
                         component: () => import('../views/teacher/Notice.vue'),
                     },
-                    {
+                    {//教师端---作业列表
                         path: 'task',
                         name: 'teacher_task',
                         component: () => import('../views/teacher/Task.vue'),
+                        meta: {
+                            breadcrumb: '作业列表'
+                        }
+                    },
+                    {//教师端---作业详情
+                        path: 'task_detail',
+                        name: 'teacher_task_detail',
+                        component: () => import('../views/teacher/TaskDetail.vue'),
+                        meta: {
+                            breadcrumb: '作业详情'
+                        }
+                    },
+                    {//教师端---学生作业详情
+                        path: 'stu_detail',
+                        name: 'teacher_task_stu_detail',
+                        component: () => import('../views/teacher/TaskDetailStu.vue'),
+                        meta: {
+                            breadcrumb: '学生作业详情'
+                        }
                     },
                     {
                         path: 'discuss',

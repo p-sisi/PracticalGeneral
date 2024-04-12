@@ -178,7 +178,7 @@ const getTaskDataRequest = async () => {
 }
 
 const submitCount = computed(() => {
-    return taskData.value.filter( (item) => item.commitStatus == 0).length;
+    return taskData.value.filter( (item: any) => item.commitStatus == 0).length;
 })
 
 
