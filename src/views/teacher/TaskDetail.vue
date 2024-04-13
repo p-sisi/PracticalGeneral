@@ -118,7 +118,7 @@
         </template>
     </el-dialog>
 
-    <!-- 编辑、新增抽屉 -->
+    <!-- 编辑抽屉 -->
     <el-drawer 
         v-model="editDrawerVisible" 
         size="50%" 

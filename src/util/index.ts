@@ -1,6 +1,6 @@
 //讲Data格式转换为字符串格式"YYYY-MM-DD HH:mm:ss"
 
-export function getStringTime(date: string) {
+export function getStringTime(date: any) {
     var time = new Date(date);
     var year = time.getFullYear();
     var month = ('0' + (time.getMonth() + 1)).slice(-2);
