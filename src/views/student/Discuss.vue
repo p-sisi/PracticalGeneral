@@ -27,7 +27,7 @@
 
         <!-- 讨论列表 -->
         <div class="discuss-list">
-            <div class="item" v-for="item in discussListData" :key="item.id">
+            <div class="item" v-for="item in discussListData" :key="item.id" @click="handleClickItem(item)">
                 <div style="display: flex;gap: 20px;align-items: center;">
                     <div> <el-avatar :size="50"> user </el-avatar></div>
                     <div class="item-text">
@@ -535,8 +535,6 @@ const handleReplyClick2 = (list: any,item: any) => {
     &-list {
         margin: 18px 0px;
         padding: 20px;
-        background-color: #f4f8ff;
-        border-radius: 8px;
         .item {
             display: flex;
             justify-content: space-between;
@@ -544,7 +542,10 @@ const handleReplyClick2 = (list: any,item: any) => {
             align-items: center;
             padding: 12px 26px;
             margin-bottom: 18px;
-            background-color: #fff;
+            border: 1px solid #cccccc5a;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
             cursor: pointer;
             .item-text {
                 display: flex;
@@ -583,6 +584,9 @@ const handleReplyClick2 = (list: any,item: any) => {
                 color: #4186ff;
                 cursor: pointer;
             }
+        }
+        .item:hover {
+            box-shadow: 0px 0px 4px rgba(0,0,0,0.2);
         }
     }
 

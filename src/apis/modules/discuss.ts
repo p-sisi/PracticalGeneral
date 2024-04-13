@@ -31,6 +31,20 @@ export function fetchDeleteDiscuss(params: any) {
 }
 
 /**
+ *  置顶讨论
+ */
+export function fetchTopDiscuss(params: any) {
+    return request.get('/discussion/setToTop', params);
+}
+
+/**
+ *  取消置顶讨论
+ */
+export function fetchCancelTopDiscuss(params: any) {
+    return request.get('/discussion/cancelTop', params);
+}
+
+/**
  * 回复评论（一级二级）
  */
 export function fetchReplyDiscuss(params: any) {

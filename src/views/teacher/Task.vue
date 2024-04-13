@@ -14,7 +14,7 @@
     <!-- 作业列表 -->
     <div class="list">
         <span class="list-num">已发布&nbsp;{{ taskListData.length }}</span>
-        <div class="list-item flex-column" v-for="item in taskListData" :key="item.id">
+        <div class="list-item flex-column" v-for="item in taskListData" :key="item.id" @click="clickListItem(item)">
             <div class="list-item-header flex-row">
                 <div class="title">{{ item.title }}</div>
                 <div class="status">
@@ -142,15 +142,7 @@ const getTaskListRequest = async () => {
 */
 const handleCommand = (item: any, command: string | number | object) => {
     if(command == 'detail') {
-        //获取当前点击的作业
-        teacherStore.setActiveTask(item);
-        if(teacherStore.breadNum = 2) {
-            teacherStore.setBreadNum(3);
-        }if(teacherStore.breadNum = 1){
-            teacherStore.setBreadNum(2);
-        }
-        // 跳转到作业详情页面
-        router.push({ path: 'task_detail', query: { taskId: item.id } })
+        clickListItem(item);
     }else if (command == 'delete') {
         deleteDialogVisible.value = true;
     }else {
@@ -162,6 +154,19 @@ const handleCommand = (item: any, command: string | number | object) => {
 
         editNewDrawerVisible.value = true;
     }
+}
+
+//点击列表item
+const clickListItem = (item: any) => {
+    //获取当前点击的作业
+    teacherStore.setActiveTask(item);
+    if(teacherStore.breadNum = 2) {
+        teacherStore.setBreadNum(3);
+    }if(teacherStore.breadNum = 1){
+        teacherStore.setBreadNum(2);
+    }
+    // 跳转到作业详情页面
+    router.push({ path: 'task_detail', query: { taskId: item.id } })
 }
 
 //点击发布按钮
