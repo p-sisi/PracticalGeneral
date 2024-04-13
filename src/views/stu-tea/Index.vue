@@ -94,7 +94,7 @@
 import { ref } from 'vue';
 import { CirclePlus, UserFilled, ArrowDown, Close } from '@element-plus/icons-vue';
 import { ElMessage } from 'element-plus';
-import { useStudentStore, useCommonStore } from '@/store'
+import { useStudentStore, useCommonStore, useTeacherStore } from '@/store'
 import { fetchAddCourse } from '../../apis/modules/course';
 import router from '../../router';
 import { useRouter } from 'vue-router';
@@ -104,6 +104,7 @@ const route = useRouter();
 
 const studentStore = useStudentStore();
 const commonStore = useCommonStore();
+const teacherStore = useTeacherStore();
 
 const dialogVisible = ref(false);
 const inputCode = ref('');
@@ -157,6 +158,9 @@ const radioChange = (item:any) => {
     }
     commonStore.setActiveHeaderMenu(item);
 
+    //左侧菜单切换至“课程资源”
+    studentStore.setActiveClassMenu('课程资源');
+    teacherStore.setActiveLeftMenu('课程资源')
 }
 
 //点击公告

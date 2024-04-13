@@ -2,11 +2,19 @@
     <div class="container">
         <!-- 左部菜单 -->
         <el-affix :offset="76">
-            <div class="container-menu">
+            <!-- 学生端 -->
+            <div class="container-menu" v-if="commonStore.userType == '学生'">
                 <div class="menuList"
-                    v-for="item in menuList"
+                    v-for="item in COURSE_MENU_STU"
                     @click="menuChange(item)" 
                     :class="{ 'selectedMenu': item.label === studentStore.activeClassMenu }">{{ item.label }}</div>
+            </div>
+            <!-- 教师端 -->
+            <div class="container-menu" v-else>
+                <div class="menuList"
+                    v-for="item in COURSE_MENU_TCH"
+                    @click="menuChange(item)" 
+                    :class="{ 'selectedMenu': item.label === teacherStore.activeLeftMenu }">{{ item.label }}</div>
             </div>
         </el-affix>
 
@@ -65,25 +73,25 @@
 <script setup lang="ts">
 import { onMounted, ref, computed } from 'vue';
 import { COURSE_MENU_STU, COURSE_MENU_TCH } from '../../content/common'
-import { useStudentStore, useCommonStore } from '@/store'
+import { useStudentStore, useCommonStore, useTeacherStore } from '@/store'
 import router from '@/router/index.ts';
 import { fetchExitCourseByStudent } from '../../apis/modules/course';
 import { ElMessage } from 'element-plus';
 
 const studentStore = useStudentStore();
 const commonStore = useCommonStore();
+const teacherStore = useTeacherStore();
 
-onMounted(() => {
-    //获取公告内容
-})
-
-const menuList = computed(() => {
-    return commonStore.userType == '教师' ? COURSE_MENU_TCH : COURSE_MENU_STU;
-})
-
+//切换左侧菜单
 const menuChange = (item: any) => {
-    if (studentStore.activeClassMenu === item.label )  return 
-    studentStore.setActiveClassMenu(item.label);
+    if(commonStore.userType == '学生') {
+        if (studentStore.activeClassMenu === item.label )  return 
+        studentStore.setActiveClassMenu(item.label);
+    }else {
+        if (teacherStore.activeLeftMenu === item.label )  return 
+        teacherStore.setActiveLeftMenu(item.label);
+    }
+   
     router.push({ name: item.routeName})
 }
 
