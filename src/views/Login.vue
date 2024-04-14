@@ -11,7 +11,7 @@
                     > {{item}}</div>
             </div>
 
-            <!-- 登录界面 -->
+            <!-- 登录输入框 -->
             <div class="login-input-login" v-show="currentStatus == '登录'">
                 <div>
                     <span class="iconfont icon-yonghu"></span>
@@ -26,7 +26,7 @@
             </div>
             <div class="login-forget" v-if="currentStatus == '登录'" @click="ForgetPassword">忘记密码</div>
             
-            <!-- 注册界面 -->
+            <!-- 注册输入框 -->
             <div class="login-input-sign" v-show="currentStatus == '注册'">
                 <div style="margin-top: 28px;">
                     <span class="iconfont icon-yonghu"></span>
@@ -45,6 +45,7 @@
                 <div class="tips">教师账号请联系管理员创建哦</div>
             </div>
 
+            <!-- 登录、注册按钮 -->
             <div class="login-btn" @click="handleLoginIn" v-if="currentStatus == '登录'">
                 <el-icon class="is-loading" v-show="isLogin" style="margin-right: 10px;">
                     <Loading />
@@ -63,7 +64,7 @@ import lottie from 'lottie-web'
 import people from '../assets/iconfont/login.json'
 import { ElMessage } from 'element-plus';
 import { Loading } from '@element-plus/icons-vue';
-import { fetchLoginIn } from '../apis/modules/login';
+import { fetchLoginIn } from '../apis/modules/user';
 import { useCommonStore } from '@/store';
 import router from '../router';
 

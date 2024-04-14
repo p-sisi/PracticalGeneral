@@ -114,3 +114,17 @@ export const COURSE_MENU_TCH = [
         routeName: 'teacher_survey'
     }
 ]
+
+//管理员端---教师列表
+export interface TACH_LIST {
+    userId: number,     //用户id
+    userType: number,   //用户类型  1:教师 0：管理员 2：学生
+    headImg: any,       //头像
+    account: string,    //教师账号
+    password: string,   //密码
+    name: string,       //教师名称
+    createTime: string,  //创建时间
+    email: any,        //绑定的邮箱
+    phone: any,      //绑定的手机账号
+    isEnable: boolean,  //账号是否可用
+}

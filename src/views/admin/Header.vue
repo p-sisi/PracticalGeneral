@@ -4,7 +4,7 @@
         <!-- 左部 -->
         <div class="header-left">
             <span class="iconfont icon-shuben-book3"></span>
-            <div>实训管理系统</div>
+            <div>实训管理系统（后台）</div>
         </div>
 
         <!-- 右部 -->
@@ -12,10 +12,10 @@
             <div class="header-right-mess">{{ 1 }}</div>
             <span class="iconfont icon-xiaoxi" style="cursor: pointer;"></span>
             <div>
-                <el-avatar :icon="UserFilled" size="small"> </el-avatar>
+                <el-avatar :icon="UserFilled" size="small" :src="`${BASE_ERL}/file/images/${commonStore.userInfo.headImg}`"> </el-avatar>
             </div>
             <div class="header-right-user">
-                <span>管理员：{{ adminStore.userName }}</span>
+                <span>管理员：{{ commonStore.userInfo.name }}</span>
             </div>
             <div class="header-right-dropdown">
                 <el-dropdown>
@@ -43,17 +43,16 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
 import { UserFilled, ArrowDown  } from '@element-plus/icons-vue';
-import { useAdminStore } from '@/store'
+import { useCommonStore } from '@/store'
 import router from '../../router';
+import { BASE_ERL } from '../../content/common'
 
-const adminStore = useAdminStore();
+const commonStore = useCommonStore();
 
 //退出登录
 const handleLoginOut = () => {
     router.push('/login');
-    adminStore.setUserName('');
 }
 
 //修改密码
@@ -115,6 +114,7 @@ $primary-color: #4186ff;
             z-index: 999;
         }
         &-user {
+            margin-left: -8px;
             font-size: 12px;
         }
         &-dropdown {

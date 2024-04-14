@@ -16,7 +16,7 @@ const routes = [
             {
                 path: 'class',
                 name: 'admin-class',
-                component: () => import('../views/admin/Class.vue'),
+                component: () => import('../views/admin/ClassList.vue'),
             },
             {
                 path: 'user-teacher',

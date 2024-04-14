@@ -17,6 +17,13 @@ export function fetchGetAllCourseTeacher() {
 }
 
 /**
+ * 管理员端---获取全部课程
+ */
+export function fetchGetAllCourseAdmin() {
+    return request.get('/course/getAllCourse');
+}
+
+/**
  * 加课码加入课程
  * @params addCode: 加课码
  */

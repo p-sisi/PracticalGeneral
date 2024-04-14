@@ -1,23 +1,29 @@
 <template>
     <div class="container">
         <el-affix>
+            <!-- 头部蓝色样式条 -->
             <div class="header">
                 <Header></Header>
             </div>
         </el-affix>
 
         <div class="body">
+            <!-- 左边菜单栏 -->
             <div class="aside">
                 <Aside></Aside>
             </div>
-            <el-scrollbar max-height="700px">
+            <!-- 右侧内容区 -->
+            <el-scrollbar max-height="1000px">
                 <div class="main">
                     <div class="main-header">
                         <!-- FIXME:面包屑未处理 -->
                         <el-breadcrumb separator="/">
-                            <el-breadcrumb-item :to="{ path: '/' }">首页</el-breadcrumb-item>
-                            <el-breadcrumb-item :to="{ path: '/' }">课程管理</el-breadcrumb-item>
-                            <el-breadcrumb-item>用户管理</el-breadcrumb-item>
+                            <el-breadcrumb-item :to="{ path: '/admin/home' }">首页</el-breadcrumb-item>
+                            <el-breadcrumb-item :to="{ path: '/admin/class' }">课程管理</el-breadcrumb-item>
+                            <el-breadcrumb-item :to="{ path: '/admin/user-student' }">学生管理</el-breadcrumb-item>
+                            <el-breadcrumb-item :to="{ path: '/admin/user-teacher' }">教师管理</el-breadcrumb-item>
+                            <el-breadcrumb-item :to="{ path: '/admin/notice' }">公告</el-breadcrumb-item>
+                            <el-breadcrumb-item :to="{ path: '/admin/log' }">操作日志</el-breadcrumb-item>
                         </el-breadcrumb>
                     </div>
                     <!-- 管理台左边菜单子路由出口 -->
@@ -31,19 +37,17 @@
 <script setup lang="ts">
 import Header from './Header.vue';
 import Aside from './Aside.vue'
-import { ref } from 'vue'
 
 </script>
 
 <style lang="scss" scoped>
 .container {
+    width: 100%;
     display: flex;
     flex-flow: column nowrap;
-    width: 100%;
     .body {
         display: flex;
         flex-flow: row nowrap;
-        min-height: 80vh;
         .aside {
             width: 180px;
         }
@@ -56,5 +60,9 @@ import { ref } from 'vue'
             }
         }
     }
+}
+.el-scrollbar {
+    width: 100%;
+    height: 100%;
 }
 </style>

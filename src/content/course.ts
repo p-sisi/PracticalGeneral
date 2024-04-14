@@ -1,4 +1,4 @@
-//学生课程列表接口
+//学生、教师、管理员端----课程列表接口
 export interface Course {
     addCode: string ;   //加课码
     courseId: number ;   //课程id
