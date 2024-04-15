@@ -19,28 +19,38 @@
                 label-width="auto"
                 status-icon
             >
+            <!-- 编辑时不能更改账号 -->
+            <el-form-item label="账号" prop="account" >
+                <el-input v-if="adminStore.isEditTeacher == false" v-model="formData.account" placeholder="请输入教师账号"/>
+                <span v-else>{{ adminStore.activeTeacherItem.account }}</span>
+            </el-form-item>
             <el-form-item label="教师名称" prop="name">
                 <el-input v-model="formData.name" placeholder="请输入教师名称"/>
             </el-form-item>
-            <el-form-item label="账号" prop="account">
-                <el-input v-model="formData.account" placeholder="请输入教师账号"/>
+            <!-- 新建时不展示账号状态 -->
+            <el-form-item label="账号状态" prop="isEnable" v-if="adminStore.isEditTeacher == true">
+                <el-select v-model="formData.isEnable" placeholder="请选择">
+                    <el-option label="启用" value="启用" />
+                    <el-option label="禁用" value="禁用" />
+                </el-select>
             </el-form-item>
-            <el-form-item label="密码" prop="password">
+            <el-form-item label="密码" prop="password" >
                 <template #default>
                     <div class="password">
                         <el-input ref="inputPasswordRef" v-model="formData.password" placeholder="请输入密码"/>
-                        <span class="default" @click="handleClickUseDefault()">使用初始密码：abc123456</span>
+                        <span class="default" @click="handleClickUseDefault()">使用初始密码：Abc123456</span>
                     </div>
                 </template>
             </el-form-item>
-            <el-form-item label="确认密码" prop="password2">
+            <!-- 密码未修改，不展示确认密码 -->
+            <el-form-item label="确认密码" prop="password2" v-if="formData.password !== adminStore.activeTeacherItem.password">
                 <el-input v-model="formData.password2" placeholder="再次输入密码"/>
             </el-form-item>
         </el-form>
 
         <!-- 表单按钮 -->
         <div class="form-btn">
-            <el-button type="primary" @click="submitForm(formRef)">创建</el-button>
+            <el-button type="primary" @click="submitForm(formRef)">{{ adminStore.isEditTeacher ? '更新' : '创建' }}</el-button>
             <el-button @click="resetForm(formRef)">重置</el-button>
         </div>
         </div>
@@ -54,11 +64,19 @@
 
 <script setup lang="ts">
 import UserUpload from './UserUpload.vue'
-import { ref, reactive } from 'vue';
+import { ref, reactive, onMounted } from 'vue';
 import { useAdminStore } from '@/store'
 import { TACH_LIST } from '../../content/common'
 import { ElMessage, type FormInstance, type FormRules } from 'element-plus'
-import { fetchSignUp } from '../../apis/modules/user'
+import { fetchSignUp,fetchUpdateUserName ,fetchUpdateUserPasswordByOld, fetchUpdateUserStatus } from '../../apis/modules/user'
+
+onMounted(() => {
+    if(adminStore.isEditTeacher == true) {
+        formData.name = adminStore.activeTeacherItem.name;
+        formData.account = adminStore.activeTeacherItem.account;
+        formData.password = adminStore.activeTeacherItem.password;
+    }
+})
 
 const adminStore = useAdminStore();
 
@@ -71,6 +89,7 @@ const clickBack = () => {
 const formData = reactive({
     name: '',
     account: '',
+    isEnable: adminStore.activeTeacherItem.isEnable ? '启用' : '禁用',
     password:'',
     password2:'',
 });
@@ -84,9 +103,12 @@ const rules = reactive<FormRules>({
     ],
     account: [
         { required: true, message: '请输入教师账号', trigger: 'blur' },
+        { min: 2, max: 12, message: '账号长度为2-12位', trigger: 'blur' },
     ],
     password: [
         { required: true, message: '请输入教师密码', trigger: 'blur' },
+        { min: 8, max: 20, message: '密码长度为8-20位', trigger: 'blur' },
+        { pattern: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,20}$/, message: '密码必须为大小写字母和数字组成', trigger: 'blur' },
     ],
     password2: [
         { required: true, message: '请再次输入教师密码', trigger: 'blur' },
@@ -102,25 +124,69 @@ const submitForm = async (formEl: FormInstance | undefined) => {
     if (!formEl) return
     await formEl.validate( async (valid:any, fields: any) => {
         if (valid) {
-            if(formData.password!==formData.password2) {
-                ElMessage.error('两次输入的密码不一致');
-                inputPasswordRef.value.focus();
-                return;
-            }
             try {
-                const params = {
-                    account: formData.account,
-                    name: formData.name,
-                    password: formData.password,
-                    userType: 1,
+                //新建教师账号
+                if(adminStore.isEditTeacher == false) {
+                    const params = {
+                        account: formData.account,
+                        name: formData.name,
+                        password: formData.password,
+                        userType: 1,
+                    }
+                    await fetchSignUp(params);
+                    ElMessage.success('注册成功');
+                    formEl.resetFields()
+                }else{
+                    //编辑教师账号，发送三个请求
+                    if(formData.name != '' && formData.name !== adminStore.activeTeacherItem.name) {
+                        try {
+                            const params = {
+                                userId: adminStore.activeTeacherItem.userId,
+                                name: formData.name
+                            }
+                            await fetchUpdateUserName(params);
+                        } catch (error) {
+                            ElMessage.error('修改名称失败！');
+                        }
+                    }
+                    if(formData.password != '' && formData.password !== adminStore.activeTeacherItem.password) {
+                        try {
+                            if(formData.password!==formData.password2) {
+                                ElMessage.error('两次输入的密码不一致');
+                                inputPasswordRef.value.focus();
+                            }else {
+                                const params = {
+                                    account: formData.account,
+                                    oldPassword: adminStore.activeTeacherItem.password,
+                                    newPassword: formData.password
+                                }
+                                await fetchUpdateUserPasswordByOld(params)
+                            }
+                        } catch (error) {
+                            ElMessage.error('修改密码失败！');
+                        }
+                    }
+                    const currentStatus = formData.isEnable === '启用' ? true : false;
+                    if(currentStatus !== adminStore.activeTeacherItem.isEnable) {
+                        try {
+                            const params = {
+                                userId: adminStore.activeTeacherItem.userId,
+                                status: currentStatus
+                            }
+                            await fetchUpdateUserStatus(params);
+                        } catch (error) {
+                            ElMessage.error('修改状态失败');
+                        }
+                    }
+                    ElMessage.success('修改成功');
+                    //信息修改成功，返回列表页面
+                    adminStore.setIsShowTeacherList(true);
                 }
-                await fetchSignUp(params);
-                formEl.resetFields()
             } catch (error) {
                 ElMessage.error('注册失败');
             }
         } else {
-            console.log('error submit!', fields)
+            console.log('表单校验失败', fields)
         }
     })
 }
@@ -132,8 +198,8 @@ const resetForm = (formEl: FormInstance | undefined) => {
 
 //点击使用初始密码
 const handleClickUseDefault = () => {
-    formData.password = 'abc123456';
-    formData.password2 = 'abc123456';
+    formData.password = 'Abc123456';
+    formData.password2 = 'Abc123456';
 
     //清除两个密码框的表单验证
     const form = formRef.value;

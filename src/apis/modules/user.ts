@@ -35,3 +35,25 @@ export function fetchIsLoginIn(params: any) {
 export function fetchAllTeacher() {
     return request.get('/user/getAllTch');
 }
+
+
+/**
+ *  修改用户姓名--- 管理员端
+ */
+export function fetchUpdateUserName(params: any) {
+    return request.get('/user/updateName',params);
+}
+
+/**
+ *  修改密码(通过旧密码)
+ */
+export function fetchUpdateUserPasswordByOld(params: any) {
+    return request.post('/user/resetPwdByOldPwd',params);
+}
+
+/**
+ *  修改用户账号状态
+ */
+export function fetchUpdateUserStatus(params: any) {
+    return request.get('/user/setUserStatus',params);
+}

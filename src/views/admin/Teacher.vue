@@ -56,8 +56,8 @@
         <div class="table-list">
             <el-table :data="tableList" height="450" stripe>
             <el-table-column fixed prop="account" label="账号" width="120px" />
-            <el-table-column prop="name" label="名称" width="60" />
-            <el-table-column fixed prop="password" label="密码" width="100px" />
+            <el-table-column prop="name" label="名称" width="80" />
+            <el-table-column fixed prop="password" label="密码" width="140px" />
             <el-table-column prop="email" label="绑定邮箱" width="110">
                 <template #default="scope">
                     <span v-if="scope.row.email == null">未绑定</span>
@@ -83,7 +83,7 @@
             </el-table-column>
                 <el-table-column label="操作">
                     <template #default="scope">
-                        <el-button size="small" @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
+                        <el-button size="small" @click="handleEdit(scope.row)">编辑</el-button>
                         <el-button size="small" type="danger" @click="handleDelete(scope.$index, scope.row)">删除</el-button>
                     </template>
                 </el-table-column>
@@ -199,9 +199,11 @@ const handleClickMultiple = () => {
 }
 
 //表格操作
-const handleEdit = (index: number, row: any) => {
+const handleEdit = (row: any) => {
     adminStore.setIsShowTeacherList(false);
-    adminStore.setIsEditTeacher(true)
+    adminStore.setIsEditTeacher(true);
+    //保存当前教师信息
+    adminStore.setActiveTeacherItem(row);
 }
 
 const handleDelete = (index: number, row: any) => {
