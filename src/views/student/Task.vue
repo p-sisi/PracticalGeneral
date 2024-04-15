@@ -214,11 +214,11 @@ const isShowUploadFile = ref(false);  //当前选择文件
 
 const uploadTaskFile = ref();    //File类型的数据
 
-const handleChangeFile = (file: any, fileList: any) => {
+const handleChangeFile = (file: any) => {
     isShowUploadFile.value = true;
     // file 是当前选择的文件，可以通过 file.raw 获取原始的 File 对象,fileList是上传的文件列表
     uploadTaskFile.value = file.raw;
-    console.log(uploadTaskFile.value)
+    console.log(file)
 };
 
 //删除已选择的文件

@@ -128,3 +128,19 @@ export interface TACH_LIST {
     phone: any,      //绑定的手机账号
     isEnable: boolean,  //账号是否可用
 }
+
+
+//视频资源列表---教师端
+export interface TEACHER_VIDEO_LIST {
+    id: number,       
+    courseId: number,  //包含该视频资源的课程id
+    deadTime: string,  //停止计分时间
+    depositFilename: string,  //原文件名，后端储存
+    originalFilename: string,  //前端展示
+    title: string,       //标题
+    duration: number,    //时长
+    fileSize: number,    //大小
+    isScore: boolean,     //是否参与计分
+    uploadTime: string,   //视频资源上传时间
+    viewCount: number,    //视频资源播放次数
+}

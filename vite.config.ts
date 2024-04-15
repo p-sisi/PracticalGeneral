@@ -13,8 +13,7 @@ export default defineConfig(() => {
       port: 1023,
       open: true,
       proxy: {
-          //正则表达式，所有以/collect|/sysDialog|/user开头的请求地址都使用target的域名，如果还有其他域名，则在下面以一样的格式补充
-          '^(/user|/notice|/course|/homework|/file|/discussion|/sign)': {
+          '^(/user|/notice|/course|/homework|/file|/discussion|/sign|/video)': {
               target: BASE_ERL,    //请求域名
               changeOrigin: true,
           }
