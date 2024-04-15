@@ -138,7 +138,7 @@ export interface TEACHER_VIDEO_LIST {
     depositFilename: string,  //原文件名，后端储存
     originalFilename: string,  //前端展示
     title: string,       //标题
-    duration: number,    //时长
+    duration: number,    //时长，单位s
     fileSize: number,    //大小
     isScore?: boolean,     //是否参与计分---教师端
     toScore?: boolean,     //是否参与计分---学生端
@@ -146,4 +146,5 @@ export interface TEACHER_VIDEO_LIST {
     viewCount: number,    //视频资源播放次数
     lastProgress?: number,  //上次进度   学生端
     maxProgress?: number,   //最大进度   学生端
+    watchDurationSeconds?: any, //视频累计观看时长，单位s----学生端
 }

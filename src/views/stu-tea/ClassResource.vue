@@ -1,5 +1,6 @@
 <template>
-    <div class="resource">
+    <!-- 资源列表 -->
+    <div class="resource" v-if="isPlay == false">
         <!-- 视频资源 -->
         <div class="resource-video">
             <div class="resource-video-title">
@@ -76,7 +77,8 @@
                         <!-- 视频item -->
                         <div class="list-item" 
                             v-for="item in videoResourceListScore"
-                            :key="item.id">
+                            :key="item.id"
+                            @click="handleClickVideoItem(item)">
                             <div class="list-item-title">{{ item.title }}</div>
                             <div class="list-item-video">
                                 <video 
@@ -85,7 +87,8 @@
                                 @mouseover="isPlayingId = item.id" 
                                 @mouseleave="isPlayingId= null"></video>
                             </div>
-                            <span class="list-item-total">累计观看时长：xxxxx</span>
+                            <!-- 教师端不展示累计观看时长 -->
+                            <span class="list-item-total" v-if="commonStore.userType == '学生'">累计观看时长：{{ ((item.watchDurationSeconds)/3600).toFixed(2) }}&nbsp;小时</span>
                             <span class="list-item-time">
                                 <span>计分截止时间：{{ getStringTime(item.deadTime) }}</span>
                                 <div style="display: flex;align-items: center;color: #4186ff;">
@@ -132,6 +135,8 @@
                                 @mouseover="isPlayingId = item.id" 
                                 @mouseleave="isPlayingId= null"></video>
                             </div>
+                            <!-- 教师端不展示累计观看时长 -->
+                            <span class="list-item-total" v-if="commonStore.userType == '学生'">累计观看时长：{{ ((item.watchDurationSeconds)/3600).toFixed(2) }}&nbsp;小时</span>
                             <span class="list-item-time">
                                 <span>计分截止时间：{{ getStringTime(item.deadTime) }}</span>
                                 <div style="display: flex;align-items: center;color: #4186ff;">
@@ -187,18 +192,88 @@
                 <span>暂无文档资源</span>
             </div>
         </div>
+    </div>
 
+    <!-- 大屏播放视频 -->
+    <div class="play" v-else>
+        <!-- 左侧菜单 -->
+        <div class="play-menu">
+            <el-menu :default-active="activeMenuIndex" class="el-menu-vertical-demo" :collapse="isCollapse">
+                <el-sub-menu index="1">
+                    <template #title>
+                        <el-icon><span class="iconfont icon-icon-video"></span></el-icon>
+                        <span>视频</span>
+                    </template>
+                    <el-menu-item-group>
+                        <el-menu-item v-for="(item, index) in videoResourceList" :key=index :index="`1-${index}`" @click="handleClickMenuItem(item)">{{ item.title }}</el-menu-item>
+                    </el-menu-item-group>
+                </el-sub-menu>
+            </el-menu>
+        </div>
+
+        <!-- 右侧视频播放 -->
+        <div class="paly-video">
+            <!-- 收起、展开菜单图标 -->
+            <div class="play-video-ico" >
+                <div class="icon" @click="isCollapse = !isCollapse">
+                    <el-tooltip class="box-item" effect="light" :content="isCollapse?'展开':'收起'" placement="right" hide-after="50">
+                        <el-icon v-if="!isCollapse"><DArrowLeft /></el-icon>
+                        <el-icon v-else><DArrowRight /></el-icon>
+                    </el-tooltip>
+                </div>
+                <!-- 返回资源列表 -->
+                <span class="back" @click="handleClickBack()"> <&nbsp;返回资源列表 </span>
+                <!-- 当前播放的视频标题 -->
+                <div class="title">{{ selectedVideoData?.title }}</div>
+            </div>
+            <!-- 视频播放框 -->
+            <div class="play-video-video">
+                <video 
+                    class="video" 
+                    ref="videoElementRef"
+                    :src="`${BASE_ERL}/file/videos/${selectedVideoData?.depositFilename}`" 
+                    controls
+                    @play="handlePlay"
+                    @pause="handlePause"
+                    @timeupdate="handleTimeUpdate"></video> 
+            </div>
+            <!-- 观看次数 -->
+            <span class="view-count">
+                <div>
+                    <span class="iconfont icon-icon-"></span>
+                    &nbsp;播放次数&nbsp;
+                    <span style="font-weight: 600">{{ selectedVideoData?.viewCount }}</span>
+                </div>
+                <div>
+                    <span>计分截止时间：</span>
+                    <span style="color: #67c23a" v-if="selectedVideoData?.toScore == true && new Date(selectedVideoData?.deadTime).getTime() > new Date()">{{ getStringTime(selectedVideoData?.deadTime) }}</span>
+                    <span style="color: #f56c6c" v-if="selectedVideoData?.toScore == true && new Date(selectedVideoData?.deadTime).getTime() < new Date()">{{ getStringTime(selectedVideoData?.deadTime) }}</span>
+                    <span v-if="selectedVideoData?.toScore == false">不参与计分</span>
+                </div>
+            </span>
+            <!-- 累计播放时长 -->
+            <div class="view-total">累计播放时长：{{ ((selectedVideoData.watchDurationSeconds)/3600).toFixed(2) }}小时</div>
+            <div class="view-total">观看进度：{{ ((selectedVideoData.maxProgress/selectedVideoData.duration)*100).toFixed(2) > 80 ? 100 : ((selectedVideoData.maxProgress/selectedVideoData.duration)*100).toFixed(2) }}%</div>
+            <div class="view-total">最大观看时长：{{ formatTime(selectedVideoData.maxProgress) }}</div>
+        </div>
     </div>
 </template>
 
 <script setup lang="ts">
 import { ref, onMounted, Ref} from 'vue';
 import { ElMessage, genFileId } from 'element-plus';
-import { Plus, Warning, Edit, Delete } from '@element-plus/icons-vue'
+import { Plus, Warning, Edit, Delete, DArrowLeft, DArrowRight,Location } from '@element-plus/icons-vue'
 import type { UploadInstance, UploadProps, UploadRawFile } from 'element-plus'
-import { fetchVideoResourceTech, fetchDeleteVideoResource, fetchUpdateVideoResource , fetchVideoResource} from '../../apis/modules/resource'
+import { 
+    fetchVideoResourceTech, 
+    fetchDeleteVideoResource, 
+    fetchUpdateVideoResource , 
+    fetchVideoResource, 
+    fetchPlayVideoResource, 
+    fetchPauseVideoResource, 
+    fetchVideoResourcePlayWatch} from '../../apis/modules/resource'
 import { TEACHER_VIDEO_LIST, BASE_ERL } from '../../content/common'
-import { getStringTime } from '../../util/index'
+import { getStringTime, formatTime } from '../../util/index'
 import { useCommonStore } from '@/store'
 import axios from 'axios';
 
@@ -346,6 +421,137 @@ const handleClickEdit = (item: any) => {
     inputDeadTime.value = item.deadTime;
     activeSelectRadio.value = item.toScore == true ? '计分' : '不计分';
 }
+
+const isPlay = ref(false);      //播放视频大屏 or 视频资源列表
+const isPlayingVideo = ref(false);     //是否正在播放视频
+let isManualSeek = false;           // 是否手动拖动进度条的标志
+
+const isCollapse = ref(false);     // 是否折叠菜单
+const activeMenuIndex = ref('');     // 当前激活的菜单项索引
+const currentTime = ref(0);          //当前视频的播放进度（xxx s）
+
+const videoElementRef = ref(null);      //视频播放器DOM
+
+//点击视频资源item
+const handleClickVideoItem = (item: any) => {
+    if(commonStore.userType == '教师') return
+    isPlay.value = true;
+    selectedVideoData.value = item;
+    const index = videoResourceList.value.findIndex((video: TEACHER_VIDEO_LIST) => video.id == item.id);
+    activeMenuIndex.value = `1-${index}`;
+}
+
+//点击返回视频列表
+const handleClickBack = () => {
+    isPlay.value = false;
+    getVideoResourceRequest()
+}
+
+//点击视频菜单
+const handleClickMenuItem = (item: any) => {
+    selectedVideoData.value = item;
+}
+
+//开始播放视频
+const handlePlay = async (event: any) => {
+    console.log('当前开始事件',Math.round(event))
+    try {
+        const params = {
+            videoId: selectedVideoData.value.id,
+            timing: currentTime.value
+        }
+        await fetchPlayVideoResource(params);
+        // 启动定时器，每30秒发送一次检查状态接口请求
+        timerId = setInterval(watchPlayStatus, 3000);
+
+        // 如果页面不可见，则暂停播放
+        if (!isPageVisible) {
+            event.target.pause();
+        }
+
+    } catch (error: any) {
+        if(error.message == '开始时间超过最大进度') {
+            //更新最大进度
+            selectedVideoData.value.maxProgress = error.data;
+            event.target.currentTime = selectedVideoData.value.maxProgress;
+        }
+        ElMessage.error(error.message);
+    }
+}
+
+//暂停播放视频
+const handlePause = async () => {
+    isPlayingVideo.value = false;
+    console.log("视频暂停播放",currentTime.value);
+    try {
+        const params = {
+            videoId: selectedVideoData.value.id,
+            timing: currentTime.value
+        }
+        await fetchPauseVideoResource(params);
+        // 停止定时器
+        if (timerId !== null) {
+            clearInterval(timerId);
+            timerId = null;
+        }
+    } catch (error: any) {
+        ElMessage.error(error.message);
+    }
+}
+
+//更新视频进度
+const handleTimeUpdate = (event:any) => {
+    currentTime.value = Math.round(event.target.currentTime);
+    if(currentTime.value > selectedVideoData.value.maxProgress) {
+        selectedVideoData.value.maxProgress = currentTime.value
+    }
+    console.log("进度", currentTime.value);
+}
+
+let timerId: number | null = null; // 定时器 ID
+
+/**
+ *  检查状态接口请求
+ */
+const watchPlayStatus = async() => {
+    try {
+        const params = {
+            videoId: selectedVideoData.value.id,
+            timing: currentTime.value
+        }
+        await fetchVideoResourcePlayWatch(params);
+    } catch (error: any) {
+        ElMessage.error(error.message)
+    }
+}
+
+const isPageVisible = ref(false);     //当前标签页是否可见
+
+document.addEventListener("visibilitychange", function() {
+    if (document.visibilityState === 'visible') {
+        console.log('页面可见');
+        isPageVisible.value = true;
+    } else {
+        console.log('页面隐藏');
+        isPageVisible.value = false;
+        if(isPlay.value == true) {
+            videoElementRef.value.pause();
+        }
+    }
+});
+
+// // 页面可见性改变时检查页面是否可见，并在不可见时暂停播放
+// document.addEventListener("visibilitychange", function() {
+//     if (!document.hidden && isPlayingVideo.value) {
+//         console.log("页面可见",);
+//         // 页面重新可见且正在播放视频，则继续播放
+//         videoElementRef.play();
+//     } else if (document.hidden && isPlayingVideo.value) {
+//         // 页面不可见且正在播放视频，则暂停播放
+//         videoElementRef.pause();
+//     }
+// });
+
 /**
  *  删除视频资源请求
  */
@@ -571,6 +777,56 @@ const fileResourceList = ref([]);   //文档资源列表
     }
 }
 
+.play {
+    display: flex;
+    .paly-video {
+        flex:1;
+        .play-video-ico {
+            display: flex;
+            .icon {
+                cursor: pointer;
+            }
+            .icon:hover {
+                color: #409eff;
+            }
+            .back {
+                margin-left: 20px;
+                font-size: 12px;
+                cursor: pointer;
+            }
+            .back:hover {
+                color: #409eff;
+            }
+            .title {
+                margin-left: 250px;
+                font-size: 18px;
+                font-weight: 600;
+            }
+        }
+        .play-video-video {
+            .video {
+                width: 100%;
+            }
+        }
+        .view-count {
+            display: flex;
+            margin-left: 20px;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 12px;
+        }
+        .view-total {
+            margin-left: 20px;
+            margin-top: 10px;
+            font-size: 14px;
+        }
+    }
+}
+
+//菜单样式
+.el-menu-vertical-demo{
+    min-height: 91vh;
+}
 .tabs-temp {    
     padding: 2px 8px;
     margin-right: 8px;

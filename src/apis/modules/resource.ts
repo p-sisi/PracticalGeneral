@@ -36,3 +36,24 @@ export function fetchDeleteVideoResource(params: any) {
 export function fetchUpdateVideoResource(params: any) {
     return request.post('/video/updateVideoInfo',params);
 }
+
+/**
+ *  暂停播放视频---学生端   监听视频进度
+ */
+export function fetchPauseVideoResource(params: any) {
+    return request.get('/video/watchStop',params);
+}
+
+/**
+ *  开始播放视频---学生端   监听视频进度
+ */
+export function fetchPlayVideoResource(params: any) {
+    return request.get('/video/watchStart',params);
+}
+
+/**
+ *  每30s检查进度，视频开始播放时开始计时器，视频暂停播放时结束计时器
+ */
+export function fetchVideoResourcePlayWatch(params: any) {
+    return request.get('/video/watchAutoCheck',params);
+}

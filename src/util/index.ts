@@ -1,4 +1,4 @@
-//讲Data格式转换为字符串格式"YYYY-MM-DD HH:mm:ss"
+//将Data格式转换为字符串格式"YYYY-MM-DD HH:mm:ss"
 
 export function getStringTime(date: any) {
     var time = new Date(date);
@@ -12,3 +12,16 @@ export function getStringTime(date: any) {
     var currentTimeString = year + '-' + month + '-' + day + ' ' + hours + ':' + minutes + ':' + seconds;
     return currentTimeString;
 }
+
+//将xxx秒转化成“00:00:00
+export function formatTime(totalSeconds: number) {
+    const hours = Math.floor(totalSeconds / 3600);
+    const minutes = Math.floor((totalSeconds % 3600) / 60);
+    const seconds = totalSeconds % 60;
+
+    const formattedHours = hours.toString().padStart(2, '0');
+    const formattedMinutes = minutes.toString().padStart(2, '0');
+    const formattedSeconds = seconds.toString().padStart(2, '0');
+
+    return `${formattedHours}:${formattedMinutes}:${formattedSeconds}`;
+};
