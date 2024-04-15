@@ -65,7 +65,7 @@ const routes = [
                     {
                         path: 'resource',
                         name: 'student_resource',
-                        component: () => import('../views/student/Resource.vue'),
+                        component: () => import('../views/stu-tea/ClassResource.vue'),
                     },
                     {
                         path: 'notice',
@@ -132,7 +132,7 @@ const routes = [
                     {
                         path: 'resource',
                         name: 'teacher_resource',
-                        component: () => import('../views/teacher/Resource.vue'),
+                        component: () => import('../views/stu-tea/ClassResource.vue'),
                     },
                     {
                         path: 'notice',

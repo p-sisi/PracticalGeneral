@@ -7,7 +7,7 @@
                     <span class="iconfont icon-video"></span>
                     <span>视频</span>
                 </div>
-                <el-button v-if="isShowUpload !== true" type="success" :icon="Plus" @click="handleClickUploadBtn()">上传视频</el-button>
+                <el-button v-if="isShowUpload !== true && commonStore.userType == '教师'" type="success" :icon="Plus" @click="handleClickUploadBtn()">上传视频</el-button>
             </div>
 
             <div class="divide"></div>
@@ -85,14 +85,16 @@
                                 @mouseover="isPlayingId = item.id" 
                                 @mouseleave="isPlayingId= null"></video>
                             </div>
+                            <span class="list-item-total">累计观看时长：xxxxx</span>
                             <span class="list-item-time">
                                 <span>计分截止时间：{{ getStringTime(item.deadTime) }}</span>
                                 <div style="display: flex;align-items: center;color: #4186ff;">
                                     <span class="iconfont icon-icon-"></span>
-                                    <span>{{ item.viewCount }}</span>
+                                    <span>&nbsp;{{ item.viewCount }}</span>
                                 </div>
                             </span>
-                            <div class="list-item-btn">
+                            <!-- 教师端进行操作，学生端没有权限 -->
+                            <div class="list-item-btn" v-if="commonStore.userType == '教师'">
                                 <el-icon class="edit" @click="handleClickEdit(item)"><Edit /></el-icon>
                                 <el-popconfirm
                                     width="220"
@@ -134,10 +136,10 @@
                                 <span>计分截止时间：{{ getStringTime(item.deadTime) }}</span>
                                 <div style="display: flex;align-items: center;color: #4186ff;">
                                     <span class="iconfont icon-icon-"></span>
-                                    <span>{{ item.viewCount }}</span>
+                                    <span>&nbsp;{{ item.viewCount }}</span>
                                 </div>
                             </span>
-                            <div class="list-item-btn">
+                            <div class="list-item-btn" v-if="commonStore.userType == '教师'">
                                 <el-icon class="edit" @click="handleClickEdit(item)"><Edit /></el-icon>
                                 <el-popconfirm
                                     width="220"
@@ -166,13 +168,14 @@
         </div>
 
         <!-- 文档资源 -->
+        <!-- ！！！！TODO：未开发 -->
         <div class="resource-file">
             <div class="resource-file-title">
                 <div>
                     <span class="iconfont icon-file"></span>
                     <span>文档</span>
                 </div>
-                <el-button type="success" :icon="Plus">上传文档</el-button>
+                <el-button v-if="commonStore.userType == '教师'" type="success" :icon="Plus">上传文档</el-button>
             </div>
             <div class="divide"></div>
             <div class="resource-file-list" v-if="fileResourceList.length !== 0">
@@ -193,7 +196,7 @@ import { ref, onMounted, Ref} from 'vue';
 import { ElMessage, genFileId } from 'element-plus';
 import { Plus, Warning, Edit, Delete } from '@element-plus/icons-vue'
 import type { UploadInstance, UploadProps, UploadRawFile } from 'element-plus'
-import { fetchVideoResourceTech, fetchDeleteVideoResource, fetchUpdateVideoResource } from '../../apis/modules/resource'
+import { fetchVideoResourceTech, fetchDeleteVideoResource, fetchUpdateVideoResource , fetchVideoResource} from '../../apis/modules/resource'
 import { TEACHER_VIDEO_LIST, BASE_ERL } from '../../content/common'
 import { getStringTime } from '../../util/index'
 import { useCommonStore } from '@/store'
@@ -217,10 +220,18 @@ const getVideoResourceRequest = async () => {
         const params = {
             courseId: commonStore.activeClass.courseId
         }
-        const result = await fetchVideoResourceTech(params)
-        videoResourceList.value = result.data;
-        videoResourceListScore.value = result.data.filter((item: any) => item.isScore == true);
-        videoResourceListNoScore.value = result.data.filter((item: any) => item.isScore === false);
+        let result;
+        if(commonStore.userType == '学生') {
+            result =  await fetchVideoResource(params)
+            videoResourceList.value = result.data;
+            videoResourceListScore.value = result.data.filter((item: any) => item.toScore == true);
+            videoResourceListNoScore.value = result.data.filter((item: any) => item.toScore === false);
+        }else {
+            result =  await fetchVideoResourceTech(params)
+            videoResourceList.value = result.data;
+            videoResourceListScore.value = result.data.filter((item: any) => item.isScore == true);
+            videoResourceListNoScore.value = result.data.filter((item: any) => item.isScore === false);
+        }
     } catch (error) {
         ElMessage.error('获取视频资源失败')
     }
@@ -313,6 +324,7 @@ const handleUploadVideo = () => {
             ElMessage.success('上传成功')
             //重新获取视频资源
             isUploading.value = false;
+            getVideoResourceRequest()
         })
         .catch((error: any) => {
             console.error('Error:', error);
@@ -345,6 +357,7 @@ const handleClickEdit = (item: any) => {
         }
         await fetchDeleteVideoResource(params);
         ElMessage.success('删除成功')
+        getVideoResourceRequest();
     } catch (error) {
         ElMessage.error('删除失败')
     }
@@ -364,7 +377,9 @@ const editVideoRequest = async () => {
             toScore: activeSelectRadio.value === '计分' ? true : false
         }
         await fetchUpdateVideoResource(params);
-        ElMessage.success('更新成功')
+        ElMessage.success('更新成功');
+        getVideoResourceRequest();
+
     } catch (error) {
         ElMessage.error('更新失败')
     }
@@ -445,11 +460,18 @@ const fileResourceList = ref([]);   //文档资源列表
                     }
                     .list-item-time {
                         display: flex;
-                        padding: 4px 8px;
+                        padding: 0px 8px;
                         font-size: 12px;
                         color: #999;
+                        margin-bottom: 8px;
                         justify-content: space-between;
                         align-items: center;
+                    }
+                    .list-item-total {
+                        font-size: 12px;
+                        font-weight: 600;
+                        padding: 0px 8px;
+                        color: #999;
                     }
                     .list-item-btn {
                         display: flex;

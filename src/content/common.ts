@@ -130,7 +130,7 @@ export interface TACH_LIST {
 }
 
 
-//视频资源列表---教师端
+//视频资源列表---教师端、学生端
 export interface TEACHER_VIDEO_LIST {
     id: number,       
     courseId: number,  //包含该视频资源的课程id
@@ -140,7 +140,10 @@ export interface TEACHER_VIDEO_LIST {
     title: string,       //标题
     duration: number,    //时长
     fileSize: number,    //大小
-    isScore: boolean,     //是否参与计分
+    isScore?: boolean,     //是否参与计分---教师端
+    toScore?: boolean,     //是否参与计分---学生端
     uploadTime: string,   //视频资源上传时间
     viewCount: number,    //视频资源播放次数
+    lastProgress?: number,  //上次进度   学生端
+    maxProgress?: number,   //最大进度   学生端
 }
