@@ -149,11 +149,15 @@ const radioChange = (item:any) => {
         }
     }else {
         commonStore.setActiveClass( commonStore.courseData.filter( (value:any) => value.courseName == item)[0] )
-        console.log(commonStore.activeClass)
+
         if(commonStore.userType == '学生') {
             router.push({ name: 'student_notice',query: { id: commonStore.activeClass.courseId }})
+            studentStore.setActiveClassMenu('课程公告');
+            location.reload()
         } else {
             router.push({ name: 'teacher_notice',query: { id: commonStore.activeClass.courseId }})
+            teacherStore.setActiveLeftMenu('课程公告')
+            location.reload()
         }
     }
     commonStore.setActiveHeaderMenu(item);

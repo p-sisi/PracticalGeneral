@@ -151,13 +151,14 @@ import { ElMessage } from 'element-plus';
 import { CLASS_STATUS } from '../../content/student'
 import { Course } from '../../content/course';
 import { Notice } from '../../content/notice';
-import { useStudentStore, useCommonStore } from '@/store'
+import { useStudentStore, useCommonStore, useTeacherStore } from '@/store'
 import router from '@/router/index.ts';
 import { fetchGetAllCourseNotice, fetchGetAllSysNotice, fetchReadNotice } from '../../apis/modules/notice';
 import { fetchGetAllCourseStudent, fetchGetAllCourseTeacher, fetchAddCourse } from '../../apis/modules/course';
 
 const studentStore = useStudentStore();
 const commonStore = useCommonStore();
+const teacherStore = useTeacherStore();
 
 onMounted(() => {
     getNoticeListRequest('系统公告');
@@ -220,9 +221,11 @@ const handleClickClass = (item:any) => {
     commonStore.setActiveHeaderMenu(item.courseName);
 
     if(commonStore.userType == '教师') {
-        router.push({ name: 'teacher_resource',query: { id: item.courseId }})
+        router.push({ name: 'teacher_notice',query: { id: item.courseId }})
+        teacherStore.setActiveLeftMenu('课程公告')
     }else {
-        router.push({ name: 'student_resource',query: { id: item.courseId }})
+        router.push({ name: 'student_notice',query: { id: item.courseId }})
+        studentStore.setActiveClassMenu('课程公告');
     }
 }
 
