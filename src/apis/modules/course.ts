@@ -38,3 +38,10 @@ export function fetchAddCourse(params: object) {
 export function fetchExitCourseByStudent(params: any) {
     return request.get('/course/stuExitCourse',params);
 }
+
+/**
+ * 获取课堂所有学生-----学生端
+ */
+export function fetchAllCourseStudent(params: any) {
+    return request.get('/course/getAllStuInCourse',params);
+}
