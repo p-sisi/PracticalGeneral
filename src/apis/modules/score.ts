@@ -10,6 +10,13 @@ export function fetchGetScoreAnalyze(params: any) {
 }
 
 /**
+ * 教师端----获取所有学生成绩所有数据
+ */
+export function fetchGetScoreAnalyzeTech(params: any) {
+    return request.get('/score/tchGetAllStu', params);
+}
+
+/**
  * 学生端----获取个人答辩记录
  */
 export function fetchGetReplyHistory(params: any) {

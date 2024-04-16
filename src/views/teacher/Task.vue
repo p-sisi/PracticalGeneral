@@ -333,6 +333,7 @@ const clearFormValidate = (formEl: FormInstance | undefined) => {
 }
 // 作业列表
 .list {
+    margin-right: 20px;
     &-num {
         font-size: 12px;
     }

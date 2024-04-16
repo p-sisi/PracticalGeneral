@@ -291,6 +291,7 @@ const handleDownLoad = async (item: any) => {
 <style scoped lang="scss">
 .task {
     margin-top: 14px;
+    margin-right: 20px;
     &-header {
         display: flex;
         justify-content:space-between;

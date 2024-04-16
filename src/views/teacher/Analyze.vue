@@ -4,10 +4,18 @@
     <!-- 分析列表 -->
     <div class="list">
         <el-table :data="listData" height="400" style="width: 100%">
-            <el-table-column prop="account" label="账号" width="160" align="center"/>
-            <el-table-column prop="name" label="作业得分" width="160" align="center"/>
-            <el-table-column prop="name" label="讨论得分" width="160" align="center"/>
-            <el-table-column prop="email" label="考勤得分" align="center"/>
+            <el-table-column prop="userAccount" label="账号" width="120" align="center"/>
+            <el-table-column prop="userName" label="姓名" width="100" align="center"/>
+            <el-table-column prop="homeworkScore.score" label="作业得分" width="90" align="center"/>
+            <el-table-column prop="discussionScore.score" label="讨论得分" width="80" align="center"/>
+            <el-table-column prop="attendanceScore.score" label="考勤得分" align="center"/>
+            <el-table-column prop="defenceScore.score" label="答辩得分" align="center"/>
+            <el-table-column prop="videoScore.score" label="资源得分" align="center"/>
+            <el-table-column prop="totalScore" label="总分" align="center">
+                <template #default="scope">
+                    <span class="score">{{ scope.row.totalScore }}</span>
+                </template>
+            </el-table-column>
         </el-table>
     </div>
 </template>
@@ -15,7 +23,7 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue';
 import { ElMessage } from 'element-plus';
-import { fetchAllCourseStudent } from '../../apis/modules/course';
+import { fetchGetScoreAnalyzeTech } from '../../apis/modules/score';
 import { useCommonStore } from '../../store';
 
 onMounted(() => {
@@ -34,7 +42,7 @@ const getListDataRequest = async () => {
         const params = {
             courseId: commonStore.activeClass.courseId
         }
-        const result = await fetchAllCourseStudent(params)
+        const result = await fetchGetScoreAnalyzeTech(params)
         listData.value = result.data
     } catch (error: any) {
         ElMessage.error(error.message)
@@ -57,5 +65,10 @@ const getListDataRequest = async () => {
     padding: 10px;
     background-color: #f8fbff;
     border-radius: 8px;
+    overflow: hidden;
+    .score {
+        color: #f56c6c;
+        font-size: 18px;
+    }
 }
 </style>

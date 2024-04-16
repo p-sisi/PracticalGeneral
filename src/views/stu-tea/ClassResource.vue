@@ -471,9 +471,10 @@ const handlePlay = async (event: any) => {
 
     } catch (error: any) {
         if(error.message == '开始时间超过最大进度') {
-            //更新最大进度
+            //更新最大进度,暂停视频播放
             selectedVideoData.value.maxProgress = error.data;
             event.target.currentTime = selectedVideoData.value.maxProgress;
+            event.target.pause()
         }
         ElMessage.error(error.message);
     }

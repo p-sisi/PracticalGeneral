@@ -306,15 +306,15 @@ const changeTab = (label: any) => {
     if (activeTab.value === label )  return 
     activeTab.value = label;
     if(activeTab.value === '时间排序') {
-        discussListData.value = discussListData.value.sort((a:any, b:any) => {
+        discussListData.value = discussListDataAll.value.sort((a:any, b:any) => {
             return new Date(a.createTime).getTime() - new Date(b.createTime).getTime();
         })
     } else if(activeTab.value === '热度优先') {
-        discussListData.value = discussListData.value.sort((a:any, b:any) => {
+        discussListData.value = discussListDataAll.value.sort((a:any, b:any) => {
             return b.hotDegree - a.hotDegree;
         })
     }else if(activeTab.value == '我的讨论'){
-        discussListData.value = discussListData.value.filter((item:any) => commonStore.userInfo.userId == item.creatorId)
+        discussListData.value = discussListDataAll.value.filter((item:any) => commonStore.userInfo.userId == item.creatorId)
     }else {
         return getDiscussListRequest();
     }

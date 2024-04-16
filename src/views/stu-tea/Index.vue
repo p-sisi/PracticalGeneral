@@ -153,11 +153,9 @@ const radioChange = (item:any) => {
         if(commonStore.userType == '学生') {
             router.push({ name: 'student_notice',query: { id: commonStore.activeClass.courseId }})
             studentStore.setActiveClassMenu('课程公告');
-            location.reload()
         } else {
             router.push({ name: 'teacher_notice',query: { id: commonStore.activeClass.courseId }})
             teacherStore.setActiveLeftMenu('课程公告')
-            location.reload()
         }
     }
     commonStore.setActiveHeaderMenu(item);
