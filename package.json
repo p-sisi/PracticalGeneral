@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "serve": "vue-cli-service serve",
     "build": "vue-tsc && vite build",
     "preview": "vite preview"
   },

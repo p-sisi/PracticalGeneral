@@ -80,7 +80,7 @@ export const COURSE_MENU_TCH = [
     },
     
     {
-        label: '学生管理',
+        label: '学生信息',
         name: 'member',
         routeName: 'teacher_member'
     },
@@ -100,7 +100,7 @@ export const COURSE_MENU_TCH = [
         routeName: 'teacher_reply'
     },
     {
-        label: '学情分析',
+        label: '学生成绩',
         name: 'analysis',
         routeName: 'teacher_analyze'
     },

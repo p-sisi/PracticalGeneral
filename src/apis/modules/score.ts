@@ -17,6 +17,13 @@ export function fetchGetReplyHistory(params: any) {
 }
 
 /**
+ * 教师端----获取所有学生答辩记录
+ */
+export function fetchGetReplyHistoryTech(params: any) {
+    return request.get('/defence/tchGetAllDefence', params);
+}
+
+/**
  * 学生端----学生申请答辩
  */
 export function fetchReplyTime(params: any) {

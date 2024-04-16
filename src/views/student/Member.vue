@@ -3,11 +3,16 @@
 
     <!-- 学生列表 -->
     <div class="list">
-        <el-table :data="listData" height="550" style="width: 80%">
-            <el-table-column type="index" width="60" />
-            <el-table-column prop="name" label="名字" width="160" />
-            <el-table-column prop="account" label="账号" width="160" />
-            <el-table-column prop="email" label="邮箱绑定" />
+        <el-table :data="listData" height="400" style="width: 100%">
+            <el-table-column type="index" width="60" align="center"/>
+            <el-table-column prop="name" label="名字" width="160" align="center"/>
+            <el-table-column prop="account" label="账号" width="160" align="center"/>
+            <el-table-column prop="email" label="邮箱绑定" align="center">
+                <template #default="scope">
+                    <span v-if="scope.row.email !== null">{{ scope.row.email }}</span>
+                    <span v-else>未绑定</span>
+                </template>
+            </el-table-column>
         </el-table>
     </div>
 </template>
@@ -44,10 +49,13 @@ const getListDataRequest = async () => {
 
 <style scoped lang="scss">
 .list {
+    width: 90%;
     display: flex;
     justify-content: center;
-    width: 90%;
     margin-left: 20px;
     margin-top: 20px;
+    padding: 10px;
+    background-color: #f8fbff;
+    border-radius: 8px;
 }
 </style>

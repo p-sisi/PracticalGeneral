@@ -88,7 +88,7 @@
                                 @mouseleave="isPlayingId= null"></video>
                             </div>
                             <!-- 教师端不展示累计观看时长 -->
-                            <span class="list-item-total" v-if="commonStore.userType == '学生'">累计观看时长：{{ ((item.watchDurationSeconds)/3600).toFixed(2) }}&nbsp;小时</span>
+                            <span class="list-item-total" v-if="commonStore.userType == '学生'">累计观看时长：{{ formatTimeString(item.watchDurationSeconds) }}</span>
                             <span class="list-item-time">
                                 <span>计分截止时间：{{ getStringTime(item.deadTime) }}</span>
                                 <div style="display: flex;align-items: center;color: #4186ff;">
@@ -136,7 +136,7 @@
                                 @mouseleave="isPlayingId= null"></video>
                             </div>
                             <!-- 教师端不展示累计观看时长 -->
-                            <span class="list-item-total" v-if="commonStore.userType == '学生'">累计观看时长：{{ ((item.watchDurationSeconds)/3600).toFixed(2) }}&nbsp;小时</span>
+                            <span class="list-item-total" v-if="commonStore.userType == '学生'">累计观看时长：{{ formatTimeString(item.watchDurationSeconds) }}</span>
                             <span class="list-item-time">
                                 <span>计分截止时间：{{ getStringTime(item.deadTime) }}</span>
                                 <div style="display: flex;align-items: center;color: #4186ff;">
@@ -252,9 +252,9 @@
                 </div>
             </span>
             <!-- 累计播放时长 -->
-            <div class="view-total">累计播放时长：{{ ((selectedVideoData.watchDurationSeconds)/3600).toFixed(2) }}小时</div>
-            <div class="view-total">观看进度：{{ ((selectedVideoData.maxProgress/selectedVideoData.duration)*100).toFixed(2) > 80 ? 100 : ((selectedVideoData.maxProgress/selectedVideoData.duration)*100).toFixed(2) }}%</div>
-            <div class="view-total">最大观看时长：{{ formatTime(selectedVideoData.maxProgress) }}</div>
+            <div class="view-total">累计播放时长：{{ formatTimeString(selectedVideoData?.watchDurationSeconds) }}</div>
+            <div class="view-total">观看进度：{{ ((selectedVideoData?.maxProgress/selectedVideoData.duration)*100).toFixed(2) > 80 ? 100 : ((selectedVideoData.maxProgress/selectedVideoData.duration)*100).toFixed(2) }}%</div>
+            <div class="view-total">最大观看时长：{{ formatTime(selectedVideoData?.maxProgress) }}</div>
         </div>
     </div>
 </template>
@@ -273,7 +273,7 @@ import {
     fetchPauseVideoResource, 
     fetchVideoResourcePlayWatch} from '../../apis/modules/resource'
 import { TEACHER_VIDEO_LIST, BASE_ERL } from '../../content/common'
-import { getStringTime, formatTime } from '../../util/index'
+import { getStringTime, formatTime, formatTimeString } from '../../util/index'
 import { useCommonStore } from '@/store'
 import axios from 'axios';
 
@@ -462,7 +462,7 @@ const handlePlay = async (event: any) => {
         }
         await fetchPlayVideoResource(params);
         // 启动定时器，每30秒发送一次检查状态接口请求
-        timerId = setInterval(watchPlayStatus, 3000);
+        timerId = setInterval(watchPlayStatus, 30000);
 
         // 如果页面不可见，则暂停播放
         if (!isPageVisible) {
