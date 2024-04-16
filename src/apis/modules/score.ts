@@ -1,4 +1,4 @@
-//成绩分析相关接口
+//成绩分析、结课答辩相关接口
 
 import request from '../request';
 
@@ -7,4 +7,18 @@ import request from '../request';
  */
 export function fetchGetScoreAnalyze(params: any) {
     return request.get('/score/getStuAllScore', params);
+}
+
+/**
+ * 学生端----获取个人答辩记录
+ */
+export function fetchGetReplyHistory(params: any) {
+    return request.get('/defence/stuGetDefence', params);
+}
+
+/**
+ * 学生端----学生申请答辩
+ */
+export function fetchReplyTime(params: any) {
+    return request.post('/defence/stuApplyDefence', params);
 }
