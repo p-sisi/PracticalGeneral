@@ -45,6 +45,15 @@ export const useTeacherStore = defineStore("teacher",{
         setIsShowCheck(isShow:boolean) {
             this.isShowCheck = isShow;
         },
+        //退出登录时初始化信息
+        initTeacherStore() {
+            this.activeCheck = {} as Check_Tech;
+            this.activeTask = {};
+            this.activeLeftMenu = '课程公告';
+            this.isShowCheck = true;
+            this.breadNum = 1
+            this.activeStudentTask = {} as Task_Tech_Commit;
+        }
     },
     persist: [
         {

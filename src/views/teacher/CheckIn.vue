@@ -278,7 +278,7 @@ import { getStringTime } from '../../util/index'
 
 onMounted(() => {
     getCheckList()
-    if(teacherStore.activeCheck.id !== null) {
+    if(Object.keys(teacherStore.activeCheck).length !== 0) {
         getStudentCheck(teacherStore.activeCheck.id)
     }
 })

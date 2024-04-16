@@ -150,35 +150,35 @@ const getAllReplyHistory = async () => {
 //切换提交状态
 const activeRadio = ref('全部') 
 const radioChange = (label: any) => {
-    if (activeRadio.value === label )  return 
-    tableData.value = tableDataAll.value;
-
-    if(label === '全部') {
-        tableData.value = tableDataAll.value;
-    } else if(label === '已提交') {
-        tableData.value = tableData.value.filter((item:any) => item.commitStatus == 1);
-    } else if(label === '未提交'){
-        tableData.value = tableData.value.filter((item:any) => item.commitStatus == 0);
-    } else {
-        tableData.value = tableData.value.filter((item:any) => item.commitStatus == 2);
-    }
-
+    if (activeRadio.value === label) return; // 如果已经是选中状态，则不进行操作
 
     activeRadio.value = label;
+
+    if (label === '全部') {
+        // 如果选中的是“全部”标签，则显示全部数据
+        tableData.value = tableDataAll.value;
+    } else {
+        // 否则，根据筛选条件过滤数据
+        tableData.value = tableDataAll.value.filter(item =>
+            item.status === status.find(item => item.label === label).value
+        );
+    }
 }
 
-//方法封装：获取对应状态文本的value
 
 //搜索
 const searchInput = ref('');
 const handleSearchDiscuss = () => {
-    activeRadio.value = '全部'
-    if(searchInput.value === '') return tableData.value = tableDataAll.value;
-
-    tableData.value = tableDataAll.value;
-    tableData.value = tableData.value.filter((item:any) => {
-        return item.stuName.includes(searchInput.value)  
-    });
+    const searchText = searchInput.value.trim(); // 获取搜索框中的文本，并去除首尾空格
+    if (searchText === '') {
+        // 如果搜索文本为空，则显示全部数据
+        tableData.value = tableDataAll.value;
+    } else {
+        // 否则，根据搜索文本过滤数据
+        tableData.value = tableDataAll.value.filter(item =>
+            item.stuName.includes(searchText) // 假设学生姓名存储在 stuName 属性中
+        );
+    }
 }
 
 </script>
