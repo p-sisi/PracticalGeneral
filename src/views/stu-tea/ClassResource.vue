@@ -527,12 +527,13 @@ const watchPlayStatus = async() => {
 
 const isPageVisible = ref(false);     //当前标签页是否可见
 
+/**
+ *  用户切换浏览器标签页，视频播放暂停
+ */
 document.addEventListener("visibilitychange", function() {
     if (document.visibilityState === 'visible') {
-        console.log('页面可见');
         isPageVisible.value = true;
     } else {
-        console.log('页面隐藏');
         isPageVisible.value = false;
         if(isPlay.value == true) {
             videoElementRef.value.pause();
@@ -540,17 +541,14 @@ document.addEventListener("visibilitychange", function() {
     }
 });
 
-// // 页面可见性改变时检查页面是否可见，并在不可见时暂停播放
-// document.addEventListener("visibilitychange", function() {
-//     if (!document.hidden && isPlayingVideo.value) {
-//         console.log("页面可见",);
-//         // 页面重新可见且正在播放视频，则继续播放
-//         videoElementRef.play();
-//     } else if (document.hidden && isPlayingVideo.value) {
-//         // 页面不可见且正在播放视频，则暂停播放
-//         videoElementRef.pause();
-//     }
-// });
+/**
+ *  鼠标移开当前项目的窗口，视频暂停
+ */
+document.addEventListener('mouseleave', function() {
+    if(isPlay.value == true) {
+        videoElementRef.value.pause();
+    }
+});
 
 /**
  *  删除视频资源请求
