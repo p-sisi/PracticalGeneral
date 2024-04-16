@@ -188,12 +188,10 @@ const handleChangePassword = () => {
 //退出登录
 const handleLoginOut = () => {
     router.push('/login');
-    //store中数据清空
-    commonStore.setUserInfo({});
-    commonStore.setUserType('');
-    commonStore.setActiveHeaderMenu('首页');
-    commonStore.setHeaderMenu(['首页']);
-    commonStore.setActiveClass([]);
+    //清空store中数据
+    commonStore.initStore();
+    //清除localStorage中的token
+    localStorage.removeItem('Token');
 }
 </script>
 

@@ -21,7 +21,7 @@ export interface CommonState{
 export const useCommonStore = defineStore("common",{
     state: (): CommonState => ({
         userType: '',
-        userInfo: {} as UserInfo,
+        userInfo: {} as userInfo,
         activeHeaderMenu: '首页' ,
         headerMenu: ['首页'],
         activeClass: {} as Course,
@@ -50,6 +50,15 @@ export const useCommonStore = defineStore("common",{
         },
         setCourseData(data: Course[]) {
             this.courseData = data;
+        },
+        //退出登录时，初始化数据
+        initStore(){
+            this.userInfo = {};
+            this.userType = '';
+            this.activeHeaderMenu = '首页';
+            this.headerMenu = ['首页'];
+            this.activeClass = {};
+            this.courseData = {};
         }
     },
     persist: [

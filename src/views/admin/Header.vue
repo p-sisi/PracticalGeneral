@@ -53,6 +53,10 @@ const commonStore = useCommonStore();
 //退出登录
 const handleLoginOut = () => {
     router.push('/login');
+    //清空store中数据
+    commonStore.initStore();
+    //清除localStorage中的token
+    localStorage.removeItem('Token');
 }
 
 //修改密码
