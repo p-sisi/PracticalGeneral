@@ -13,7 +13,7 @@ export interface TeacherState{
 
 export const useTeacherStore = defineStore("teacher",{
     state: (): TeacherState => ({
-        activeLeftMenu: '课程资源',
+        activeLeftMenu: '课程公告',
         activeTask: {},
         breadNum: 1,
         activeStudentTask: {} as Task_Tech_Commit,

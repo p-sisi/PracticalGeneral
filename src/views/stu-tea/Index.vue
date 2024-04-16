@@ -128,9 +128,9 @@ const handleAddCourse = async () => {
         commonStore.setCourseData([...commonStore.courseData, newClass]);
         
         if(commonStore.userType == '学生'){
-            router.push({ name: 'student_resource',query: { id: newClass.courseId }})
+            router.push({ name: 'student__notice',query: { id: newClass.courseId }})
         } else {
-            router.push({ name: 'teacher_resource',query: { id: newClass.courseId }})
+            router.push({ name: 'teacher_notice',query: { id: newClass.courseId }})
         }
 
     } catch (error: any) {
@@ -151,16 +151,16 @@ const radioChange = (item:any) => {
         commonStore.setActiveClass( commonStore.courseData.filter( (value:any) => value.courseName == item)[0] )
         console.log(commonStore.activeClass)
         if(commonStore.userType == '学生') {
-            router.push({ name: 'student_resource',query: { id: commonStore.activeClass.courseId }})
+            router.push({ name: 'student_notice',query: { id: commonStore.activeClass.courseId }})
         } else {
-            router.push({ name: 'teacher_resource',query: { id: commonStore.activeClass.courseId }})
+            router.push({ name: 'teacher_notice',query: { id: commonStore.activeClass.courseId }})
         }
     }
     commonStore.setActiveHeaderMenu(item);
 
-    //左侧菜单切换至“课程资源”
-    studentStore.setActiveClassMenu('课程资源');
-    teacherStore.setActiveLeftMenu('课程资源')
+    //左侧菜单切换至“课程公告”
+    studentStore.setActiveClassMenu('课程公告');
+    teacherStore.setActiveLeftMenu('课程公告')
 }
 
 //点击公告

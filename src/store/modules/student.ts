@@ -22,7 +22,7 @@ export const useStudentStore = defineStore("student",{
             teacher: '杨思远',   //任教老师
             status: 1,     //课程状态 0 已结束  1 进行中
         },
-        activeClassMenu: '课程资源',
+        activeClassMenu: '课程公告',
         activeMenu: '首页',
         activeHomeTab: '我的课程'
     }),
