@@ -59,11 +59,6 @@ export const COURSE_MENU_STU = [
         name: 'analysis',
         routeName: 'student_analyze'
     },
-    {
-        label: '问卷调查',
-        name: 'survey',
-        routeName: 'student_survey'
-    }
 ]
 
 //教师端---课程详情页菜单
@@ -109,11 +104,6 @@ export const COURSE_MENU_TCH = [
         name: 'analysis',
         routeName: 'teacher_analyze'
     },
-    {
-        label: '问卷调查',
-        name: 'survey',
-        routeName: 'teacher_survey'
-    }
 ]
 
 //管理员端---教师列表

@@ -101,13 +101,7 @@ const routes = [
                         path: 'member',
                         name: 'student_member',
                         component: () => import('../views/student/Member.vue'),
-                    },
-                    {
-                        path: 'survey',
-                        name: 'student_survey',
-                        component: () => import('../views/student/Survey.vue'),
-                    },
-                    
+                    },           
                 ]
             },
         ] 
@@ -188,12 +182,6 @@ const routes = [
                         name: 'teacher_member',
                         component: () => import('../views/teacher/Member.vue'),
                     },
-                    {
-                        path: 'survey',
-                        name: 'teacher_survey',
-                        component: () => import('../views/teacher/Survey.vue'),
-                    },
-                    
                 ]
             },
         ]
