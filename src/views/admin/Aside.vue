@@ -1,17 +1,12 @@
 <template>
     <div class="aside">
         <el-menu
-            default-active="home"
+            default-active="class"
             class="el-menu-vertical-demo"
             router="true"
             @open="handleOpen"
             @close="handleClose"
       >
-            <el-menu-item index="home">
-                <span class="iconfont icon-52shouye-1"></span>
-                <span>首页</span>
-            </el-menu-item>
-
             <el-menu-item index="class">
                 <span class="iconfont icon-wodekecheng"></span>
                 <span>课程管理</span>

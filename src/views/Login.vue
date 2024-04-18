@@ -133,7 +133,7 @@ const handleLoginIn  = async () => {
         isLogin.value = false;
         ElMessage.success('登录成功！');
         if(commonStore.userType == '管理员') {
-            router.push({name:'admin-home'});
+            router.push({name:'admin-class'});
         }else if(commonStore.userType == '教师') {
             router.push({name:'teacher_index'});
         }else {

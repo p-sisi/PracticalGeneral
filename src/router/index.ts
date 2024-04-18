@@ -2,7 +2,6 @@ import { createRouter,createWebHashHistory } from "vue-router";
 
 //管理员页面
 import admin from '../views/admin/Index.vue'
-import adminHome from '../views/admin/Home.vue'
 import adminClass from '../views/admin/ClassList.vue'
 import adminTeacher from '../views/admin/Teacher.vue'
 import adminStudent from '../views/admin/Student.vue'
@@ -47,11 +46,6 @@ const routes = [
         path: '/admin',  
         component: admin,
         children: [
-            {
-              path: 'home',
-              name: 'admin-home',
-              component: adminHome,
-            },
             {
                 path: 'class',
                 name: 'admin-class',

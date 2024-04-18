@@ -18,7 +18,6 @@
                     <div class="main-header">
                         <!-- FIXME:面包屑未处理 -->
                         <el-breadcrumb separator="/">
-                            <el-breadcrumb-item :to="{ path: '/admin/home' }">首页</el-breadcrumb-item>
                             <el-breadcrumb-item :to="{ path: '/admin/class' }">课程管理</el-breadcrumb-item>
                             <el-breadcrumb-item :to="{ path: '/admin/user-student' }">学生管理</el-breadcrumb-item>
                             <el-breadcrumb-item :to="{ path: '/admin/user-teacher' }">教师管理</el-breadcrumb-item>
