@@ -24,6 +24,13 @@ export function fetchNewCheck(params: any) {
 }
 
 /**
+ * 教师端----删除签到
+ */
+export function fetchDeleteCheck(params: any) {
+    return request.get('/sign/delete', params);
+}
+
+/**
  * 教师端----停止签到
  */
 export function fetchStopCheck(params: any) {

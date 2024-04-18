@@ -22,6 +22,7 @@
             <div class="list-item-time flex-row">
                 <span>发布：{{ item.createTime }}</span>
                 <span>截止：{{ item.deadTime }}</span>
+                <span class="delete" @click.stop="handleClickDelete(item)"><el-icon><Delete /></el-icon>&nbsp;&nbsp;删除</span>
             </div>
         </div>
     </div>
@@ -41,12 +42,11 @@
                     <span>{{ teacherStore.activeCheck.title }}</span>
                     
                 </div>
-                <span style="font-size: 14px" v-if="new Date(teacherStore.activeCheck.deadTime).getTime() > new Date().getTime()">签到码：<span style="color:#4186ff;font-size: 20px">{{ teacherStore.activeCheck.signCode }}</span></span>
-                <div>
-                    <el-button v-if="new Date(teacherStore.activeCheck.deadTime).getTime() > new Date().getTime()" type="success" @click="delayTimeDialogVisible = true">延时</el-button>
+                <span style="font-size: 14px" v-if="teacherStore.activeCheck.signType == 1">签到码：<span style="color:#4186ff;font-size: 20px">{{ teacherStore.activeCheck.signCode }}</span></span>
+                <div class="btn">
+                    <el-button type="success" @click="delayTimeDialogVisible = true">延时</el-button>
+                    <el-button v-if="new Date(teacherStore.activeCheck.deadTime).getTime() >= new Date().getTime()" type="danger" @click="stopDialogVisible = true">停止签到</el-button>
                     <div v-else class="title-stop">已截止</div>
-                    <el-button v-if="new Date(teacherStore.activeCheck.deadTime).getTime() > new Date().getTime()" type="danger" @click="stopDialogVisible = true">停止签到</el-button>
-
                 </div>
             </div>
             <!-- 时间 -->
@@ -168,7 +168,7 @@
                             </el-radio-group>
                         </el-form-item>
                         <el-form-item label="签到码" prop="signCode" v-if="newFromData.signType == '1'">
-                            <el-input v-model="newFromData.signCode" maxlength="6"/>
+                            <el-input v-model="newFromData.signCode" maxlength="4"/>
                         </el-form-item>
                         <el-form-item label="截止时间" prop="deadTime">
                             <el-date-picker
@@ -207,17 +207,19 @@
         </template>
     </el-dialog>
 
-    <!-- 停止签到对话框 -->
+    <!-- 停止签到对话框 、删除签到确认框 -->
     <el-dialog
         v-model="stopDialogVisible"
         title="提示"
         width="400"
         >
-        <span style="margin-left: 50px;">确定停止签到?</span>
+        <span style="margin-left: 50px; font-size: 18px" v-if="isDelete == false">确定停止签到?</span>
+        <span style="margin-left: 50px;" v-else>确定删除签到<span style="font-weight: 600;font-size:17px;margin: 0px 10px">{{ teacherStore.activeCheck.title }}</span>?</span>
         <template #footer>
             <div class="dialog-footer">
                 <el-button @click="stopDialogVisible = false">取消</el-button>
-                <el-button type="primary" @click="stopCheckRequest()" color="#4186ff">停止</el-button>
+                <el-button v-if="isDelete == false" type="primary" @click="stopCheckRequest()" color="#4186ff">停止</el-button>
+                <el-button v-else type="primary" @click="deleteCheck(teacherStore.activeCheck.id)" color="#4186ff">删除</el-button>
             </div>
         </template>
     </el-dialog>
@@ -245,13 +247,14 @@
             </div>
         </template>
     </el-dialog>
+
     <!-- 修改签到状态确认框 二次弹窗-->
     <el-dialog
         v-model="editDialogVisible2"
         title="修改签到状态"
         width="300"
         >
-        <span style="margin-left:50px">确定将&nbsp;&nbsp;<span style="font-size:18px;">{{ studentCheckData.stuName }}&nbsp;&nbsp;</span>签到状态</span>
+        <span style="margin-left:50px">确定将&nbsp;&nbsp;<span style="font-size:18px;">{{ studentCheckData?.stuName }}&nbsp;&nbsp;</span>签到状态</span>
         <div style="display:flex;align-items:center;margin-left:80px;margin-top:10px">
             <span style="font-size:18px;color:#82cc5c;">{{ studentCheckStatus }}</span>
             <span><el-icon><Right /></el-icon></span>
@@ -269,9 +272,9 @@
 
 <script setup lang="ts">
 import { ref, onMounted, reactive, Ref, computed } from 'vue';
-import { Plus, Search,Right } from '@element-plus/icons-vue';
+import { Plus, Search, Right, Delete } from '@element-plus/icons-vue';
 import { type FormRules, type FormInstance, ElMessage } from 'element-plus';
-import { fetchGetAllCheckTech, fetchNewCheck, fetchStopCheck, fetchCheckStatusList, fetchEditCheckStatus, fetchDelayCheck } from '../../apis/modules/check'
+import { fetchGetAllCheckTech, fetchNewCheck, fetchStopCheck, fetchCheckStatusList, fetchEditCheckStatus, fetchDelayCheck, fetchDeleteCheck } from '../../apis/modules/check'
 import { useCommonStore, useTeacherStore } from '@/store';
 import { Check_Tech, Check_Tech_Status } from '../../content/check'
 import { getStringTime } from '../../util/index'
@@ -313,6 +316,33 @@ const rulesForm = reactive<FormRules>({
         { required: true, message: '请选择截止时间', trigger: 'blur' },
     ]
 })
+
+const isDelete = ref(false);        //与停止签到共用一个确认框，所以标记状态
+
+//点击删除按钮
+const handleClickDelete = (item: any) => {
+    teacherStore.setActiveCheck(item);
+    stopDialogVisible.value = true;
+
+    isDelete.value = true
+}
+
+/**
+ *  删除某个签到
+ */
+const deleteCheck = async (id:number) => {
+    try {
+        await fetchDeleteCheck({
+            attendanceId: id
+        })
+        ElMessage.success('删除成功');
+        getCheckList();
+        isDelete.value = false;
+        stopDialogVisible.value = false;
+    } catch (error:any) {
+        ElMessage.error(error.message)
+    }
+}
 
 /**
  *  发布签到请求
@@ -427,6 +457,10 @@ const stopCheckRequest = async () => {
         await fetchStopCheck(params);
         ElMessage.success('停止签到成功');
         stopDialogVisible.value = false;
+
+        //修改store中的截止时间，为了显示问题
+        teacherStore.setActiveCheckDeadTime(getStringTime(new Date().getTime()));
+
     } catch (error: any) {
         console.log(error)
         stopDialogVisible.value = false;
@@ -660,6 +694,10 @@ const editCheckRequest = async () => {
             gap: 140px;
             font-size: 12px;
             color: #9c9a9a;
+            .delete:hover {
+                color: #f56c6c;
+                cursor: pointer;
+            }
         }
    }
    &-item:hover {
@@ -686,9 +724,14 @@ const editCheckRequest = async () => {
             justify-content: space-between;
             align-items: center;
             font-size: 18px;
+            .btn {
+                display: flex;
+                gap: 10px;
+            }
         }
         .title-stop {
             color: #f56c6c;
+            font-size: 20px;
         }
         .time {
             margin-left: 10px;
