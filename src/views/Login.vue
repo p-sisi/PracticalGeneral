@@ -11,6 +11,8 @@
                     > {{item}}</div>
             </div>
 
+            <div class="login-email" v-if="isLoginByAccount" @click="isLoginByAccount = false">邮箱登录 ></div>
+            <div class="login-account" v-else @click="isLoginByAccount = true">< 账号登录</div>
             <!-- 登录输入框 -->
             <div class="login-input-login" v-show="currentStatus == '登录'">
                 <div>
@@ -80,6 +82,8 @@ onMounted(() => {
         animationData: people   
     })
 })
+
+const isLoginByAccount = ref(true);
 
 // 登录注册状态
 const currentStatus = ref('登录');
@@ -212,6 +216,13 @@ $primary-color: #4186ff;
                 border-bottom: 3px solid $primary-color;
                 border-radius: 2px;
             }
+        }
+        .login-email {
+            display: flex;
+            margin-top: 10px;
+            justify-content: flex-end;
+            font-size: 14px;
+            cursor: pointer;
         }
         &-input-login {
             margin-top: 40px;

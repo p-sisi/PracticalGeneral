@@ -105,7 +105,7 @@
                 <div class="content">{{ activeDiscussData.content }}</div>
                 <div class="review">
                     <el-input v-model="inputDiscussText" style="width: 90%" placeholder="请输入评论内容" clearable type="textarea" :rows="1" autosize/>
-                    <div style="margin-left: 10px;" @click="handleReplyDiscuss"><el-button type="primary" >发表</el-button></div>
+                    <div style="margin-left: 10px;" @click="handleReplyDiscuss" @keydown.enter="handleReplyDiscuss"><el-button type="primary" >发表</el-button></div>
                 </div>
 
                 <div class="reply-count">全部回复（{{ discussCommentData.length }}）</div>
@@ -147,7 +147,7 @@
                                         type="textarea" 
                                         placeholder="请输入" 
                                         autosize/>
-                                    <el-button type="primary" :icon="Position" round size="small" @click="handleSendReply(item)"/>
+                                    <el-button type="primary" :icon="Position" round size="small" @click="handleSendReply(item)" @keydown.enter="handleSendReply(item)"/>
                                 </div>
                             </div>
                         </div>
@@ -191,7 +191,7 @@
                                             type="textarea" 
                                             placeholder="请输入" 
                                             autosize/>
-                                        <el-button type="primary" :icon="Position" round size="small" @click="handleSendReply2(list,item)"/>
+                                        <el-button type="primary" :icon="Position" round size="small" @click="handleSendReply2(list,item)" @keydown.enter="handleSendReply2(list,item)"/>
                                     </div>
                                 </div>
                                 

@@ -36,7 +36,7 @@ export function fetchGetAllSysNotice() {
  * 设置已读
  */
 export function fetchReadNotice(params: object) {
-    return request.get('/notice/setNoticeIsRead',params);
+    return request.post('/notice/setNoticeIsRead',params);
 }
 
 /**

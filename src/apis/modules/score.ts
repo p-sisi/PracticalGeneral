@@ -31,6 +31,27 @@ export function fetchGetReplyHistoryTech(params: any) {
 }
 
 /**
+ * 教师端----删除某个答辩记录
+ */
+export function fetchDeleteReply(params: any) {
+    return request.get('/defence/deleteDefence', params);
+}
+
+/**
+ * 教师端----修改学生答辩的状态：通过、拒绝
+ */
+export function fetchChangeReplyStatus(params: any) {
+    return request.get('/defence/authorizeDefence', params);
+}
+
+/**
+ * 教师端----修改学生答辩的信息
+ */
+export function fetchEditReplyStatus(params: any) {
+    return request.post('/defence/updateDefenceInfo', params);
+}
+
+/**
  * 学生端----学生申请答辩
  */
 export function fetchReplyTime(params: any) {

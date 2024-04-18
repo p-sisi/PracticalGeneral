@@ -1,5 +1,6 @@
 <template>
     <div class="container">
+        <!-- 头部介绍 -->
         <div class="container-header">
             <div class="title">实训教学过程</div>
             <div class="introduce">解锁创新教学，畅享实训之旅！为您提供全方位的教学支持和管理工具。轻松规划、组织和追踪实训课程，让学生获得实践技能，激发潜能。</div>
@@ -17,6 +18,7 @@
             </el-input>
         </div>
 
+        <!-- 左侧菜单栏 -->
         <el-affix :offset="120">
             <div class="container-tab">
                 <div class="tabList"
@@ -88,18 +90,20 @@
                 </div>
             </div>
 
-            <!-- 公告 -->
+            <!-- 公告列表 -->
             <div class="notice" v-show="studentStore.activeHomeTab == '公告栏'">
                 <!-- 公告类型 -->
                 <div class="notice-type">
                     <div class="type-container">
                         <div 
+                            v-if="commonStore.userType == '学生'"
                             class="type" 
                             v-for="item in ['系统公告','课程公告']" 
                             :class="{ 'selected': item === activeNoticeType }" 
                             @click="noticeTypeChange(item)">
                             {{ item }}
                         </div>
+                        <div v-else class="type selected" >系统公告</div>
                     </div>
                     
                     <div class="btn">
@@ -116,6 +120,7 @@
                         </div>
                     </div>
                 </div>
+
                 <!-- 公告列表 -->
                 <div class="notice-item">
                     <div 
@@ -282,7 +287,6 @@ const activeNoticeType = ref('系统公告')
 const noticeTypeChange = (label: any) => {
     if (activeNoticeType.value === label )  return 
     activeNoticeType.value = label;
-
     getNoticeListRequest(activeNoticeType.value);
 }
 
@@ -294,11 +298,12 @@ const noticeItemClick = (item: any) => {
 }
 
 //已读公告
-const setReadNoticeRequest = async (ids: any[]) => {
+const setReadNoticeRequest = async (array: any[]) => {
     try {
         const params = {
-            ids
+            ids:array,
         }
+        console.log(params.ids)
         await fetchReadNotice(params);
         getNoticeListRequest(activeNoticeType.value);
     } catch (error) {

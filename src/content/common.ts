@@ -1,5 +1,5 @@
 //后端域名,更换ip地址
-export const BASE_ERL = 'http://10.38.173.114:8081/';
+export const BASE_ERL = 'http://10.33.95.133:8081/';
 
 //用户类型
 export const USER_TYPE = [

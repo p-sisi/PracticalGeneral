@@ -75,10 +75,10 @@ const handleRefresh = () => {
 }
 
 //已读公告
-const setReadNoticeRequest = async (ids: any) => {
+const setReadNoticeRequest = async (idArray: any) => {
     try {
         const params = {
-            ids: ids
+            ids: idArray
         }
         await fetchReadNotice(params);
         getCourseDataRequest();
