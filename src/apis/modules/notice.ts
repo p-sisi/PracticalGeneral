@@ -26,10 +26,17 @@ export function fetchGetCourseNoticeTeacher(params: object) {
 }
 
 /**
- * 获取所有系统公告
+ * 获取所有系统公告---教师、学生端
  */
 export function fetchGetAllSysNotice() {
     return request.get('/notice/getSysNotice');
+}
+
+/**
+ * 获取所有系统公告---管理员端
+ */
+export function fetchGetAllSysNoticeAdmin() {
+    return request.get('/notice/admGetSysNotice');
 }
 
 /**
@@ -59,6 +66,13 @@ export function fetchEditNotice(params: object) {
  */
 export function fetchNewCourseNotice(params: object) {
     return request.post('/notice/newCourseNotice', params);
+}
+
+/**
+ * 新增系统公告
+ */
+export function fetchNewSysNotice(params: object) {
+    return request.post('/notice/newSysNotice', params);
 }
 
 /**
