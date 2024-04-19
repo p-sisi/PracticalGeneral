@@ -15,16 +15,6 @@
             <!-- 右侧内容区 -->
             <el-scrollbar max-height="1000px">
                 <div class="main">
-                    <div class="main-header">
-                        <!-- FIXME:面包屑未处理 -->
-                        <el-breadcrumb separator="/">
-                            <el-breadcrumb-item :to="{ path: '/admin/class' }">课程管理</el-breadcrumb-item>
-                            <el-breadcrumb-item :to="{ path: '/admin/user-student' }">学生管理</el-breadcrumb-item>
-                            <el-breadcrumb-item :to="{ path: '/admin/user-teacher' }">教师管理</el-breadcrumb-item>
-                            <el-breadcrumb-item :to="{ path: '/admin/notice' }">公告</el-breadcrumb-item>
-                            <el-breadcrumb-item :to="{ path: '/admin/log' }">操作日志</el-breadcrumb-item>
-                        </el-breadcrumb>
-                    </div>
                     <!-- 管理台左边菜单子路由出口 -->
                     <router-view></router-view>
                 </div>
