@@ -1,8 +1,8 @@
 <template>
     <!-- 返回 -->
     <div>
-        <span class="back-to" @click="clickOneCreate()">< 返回单次创建教师账号</span>
-        <span class="title">批量导入教师账号</span>
+        <span class="back-to" @click="clickOneCreate()">< 返回单次创建账号</span>
+        <span class="title">批量导入账号</span>
     </div>
 
     <!-- 上传按钮 -->
@@ -321,7 +321,7 @@ const exportUserRequest = async (data: any) => {
     })
     console.log('即将导入的数据',data)
     newData.forEach((item: any) => {
-        item.userType = 1;
+        item.userType = adminStore.isUploadTeacher == true ? 1 : 2;
         item.password = 'Abc123456'
     });
     try {

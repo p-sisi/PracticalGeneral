@@ -11,6 +11,12 @@ export interface AdminState{
     isEditTeacher: boolean;   //编辑用户、新建用户
     isShowMultipleCreate: boolean;   //
     activeTeacherItem: any;    //当前选择的教师信息
+
+    isShowStudentList: boolean;   //学生管理：是否展示用户列表、否：展示新建用户及编辑用户
+    isEditStudent: boolean;   //编辑用户、新建用户
+    activeStudentItem: any;    //当前选择的学生信息
+
+    isUploadTeacher: boolean;   //当前是导入教师还是学生
 }
 
 export const useAdminStore = defineStore("admin",{
@@ -23,6 +29,10 @@ export const useAdminStore = defineStore("admin",{
         activeTeacherItem: {},
         isEditClass: false,
         isShowCourseEdit: false,
+        isShowStudentList: true,
+        isEditStudent: false,
+        activeStudentItem: {},
+        isUploadTeacher: false,
     }),
     getters:{
     },
@@ -56,6 +66,18 @@ export const useAdminStore = defineStore("admin",{
         },
         setIsShowCourseEdit(val: any) {
             this.isShowCourseEdit = val;
+        },
+        setIsEditStudent(val: boolean){
+            this.isEditStudent = val;
+        },
+        setIsShowStudentList(val: boolean){
+            this.isShowStudentList = val;
+        },
+        setActiveStudentItem(val: any){
+            this.activeStudentItem = val;
+        },
+        setIsUploadTeacher(val: any) {
+            this.isUploadTeacher = val
         }
     },
     persist: [

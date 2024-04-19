@@ -1,12 +1,12 @@
 <template>
-    <!-- 单个编辑、新建教师信息 -->
+    <!-- 单个编辑、新建学生信息 -->
     <div class="create-one" v-if="adminStore.isShowMultipleCreate == false">
         <!-- 返回 -->
-        <div class="back" @click="clickBack()">< 返回教师列表</div>
+        <div class="back" @click="clickBack()">< 返回学生列表</div>
 
         <!-- 标题 -->
         <div class="title">
-            <span>{{ adminStore.isEditTeacher == true ? '编辑教师账号信息' : '创建教师账号' }}</span>
+            <span>{{ adminStore.isEditStudent == true ? '编辑学生账号信息' : '创建学生账号' }}</span>
             <el-button type="primary" @click="handleMultipleUpload()">批量创建</el-button>
         </div>
 
@@ -21,14 +21,14 @@
             >
             <!-- 编辑时不能更改账号 -->
             <el-form-item label="账号" prop="account" >
-                <el-input v-if="adminStore.isEditTeacher == false" v-model="formData.account" placeholder="请输入教师账号"/>
-                <span v-else>{{ adminStore.activeTeacherItem.account }}</span>
+                <el-input v-if="adminStore.isEditStudent == false" v-model="formData.account" placeholder="请输入学生账号"/>
+                <span v-else>{{ adminStore.activeStudentItem.account }}</span>
             </el-form-item>
-            <el-form-item label="教师名称" prop="name">
-                <el-input v-model="formData.name" placeholder="请输入教师名称"/>
+            <el-form-item label="学生名称" prop="name">
+                <el-input v-model="formData.name" placeholder="请输入学生名称"/>
             </el-form-item>
             <!-- 新建时不展示账号状态 -->
-            <el-form-item label="账号状态" prop="isEnable" v-if="adminStore.isEditTeacher == true">
+            <el-form-item label="账号状态" prop="isEnable" v-if="adminStore.isEditStudent == true">
                 <el-select v-model="formData.isEnable" placeholder="请选择">
                     <el-option label="启用" value="启用" />
                     <el-option label="禁用" value="禁用" />
@@ -43,20 +43,20 @@
                 </template>
             </el-form-item>
             <!-- 密码未修改，不展示确认密码 -->
-            <el-form-item label="确认密码" prop="password2" v-if="formData.password !== adminStore.activeTeacherItem.password">
+            <el-form-item label="确认密码" prop="password2" v-if="formData.password !== adminStore.activeStudentItem.password">
                 <el-input v-model="formData.password2" placeholder="再次输入密码"/>
             </el-form-item>
         </el-form>
 
         <!-- 表单按钮 -->
         <div class="form-btn">
-            <el-button type="primary" @click="submitForm(formRef)">{{ adminStore.isEditTeacher ? '更新' : '创建' }}</el-button>
+            <el-button type="primary" @click="submitForm(formRef)">{{ adminStore.isEditStudent ? '更新' : '创建' }}</el-button>
             <el-button @click="resetForm(formRef)">重置</el-button>
         </div>
         </div>
     </div>
 
-    <!-- 批量导入教师信息 -->
+    <!-- 批量导入学生信息 -->
     <div class="multiple-create" v-else>
         <UserUpload></UserUpload>
     </div>
@@ -70,10 +70,10 @@ import { ElMessage, type FormInstance, type FormRules } from 'element-plus'
 import { fetchSignUp,fetchUpdateUserName ,fetchUpdateUserPasswordByOld, fetchUpdateUserStatus } from '../../apis/modules/user'
 
 onMounted(() => {
-    if(adminStore.isEditTeacher == true) {
-        formData.name = adminStore.activeTeacherItem.name;
-        formData.account = adminStore.activeTeacherItem.account;
-        formData.password = adminStore.activeTeacherItem.password;
+    if(adminStore.isEditStudent == true) {
+        formData.name = adminStore.activeStudentItem.name;
+        formData.account = adminStore.activeStudentItem.account;
+        formData.password = adminStore.activeStudentItem.password;
     }
 })
 
@@ -81,7 +81,7 @@ const adminStore = useAdminStore();
 
 //点击返回
 const clickBack = () => {
-    adminStore.setIsShowTeacherList(true);
+    adminStore.setIsShowStudentList(true);
 }
 
 //点击批量创建
@@ -91,11 +91,12 @@ const handleMultipleUpload = () => {
     adminStore.setIsShowMultipleCreate(true)
 }
 
+
 //表单数据
 const formData = reactive({
     name: '',
     account: '',
-    isEnable: adminStore.activeTeacherItem.isEnable ? '启用' : '禁用',
+    isEnable: adminStore.activeStudentItem.isEnable ? '启用' : '禁用',
     password:'',
     password2:'',
 });
@@ -105,19 +106,19 @@ const inputPasswordRef = ref(null);
 
 const rules = reactive<FormRules>({
     name: [
-        { required: true, message: '请输入教师名称', trigger: 'blur' },
+        { required: true, message: '请输入学生名称', trigger: 'blur' },
     ],
     account: [
-        { required: true, message: '请输入教师账号', trigger: 'blur' },
+        { required: true, message: '请输入学生账号', trigger: 'blur' },
         { min: 2, max: 12, message: '账号长度为2-12位', trigger: 'blur' },
     ],
     password: [
-        { required: true, message: '请输入教师密码', trigger: 'blur' },
+        { required: true, message: '请输入学生密码', trigger: 'blur' },
         { min: 8, max: 20, message: '密码长度为8-20位', trigger: 'blur' },
         { pattern: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,20}$/, message: '密码必须为大小写字母和数字组成', trigger: 'blur' },
     ],
     password2: [
-        { required: true, message: '请再次输入教师密码', trigger: 'blur' },
+        { required: true, message: '请再次输入学生密码', trigger: 'blur' },
     ],
 })
 
@@ -131,8 +132,8 @@ const submitForm = async (formEl: FormInstance | undefined) => {
     await formEl.validate( async (valid:any, fields: any) => {
         if (valid) {
             try {
-                //新建教师账号
-                if(adminStore.isEditTeacher == false) {
+                //新建学生账号
+                if(adminStore.isEditStudent == false) {
                     const params = {
                         account: formData.account,
                         name: formData.name,
@@ -143,11 +144,11 @@ const submitForm = async (formEl: FormInstance | undefined) => {
                     ElMessage.success('注册成功');
                     formEl.resetFields()
                 }else{
-                    //编辑教师账号，发送三个请求
-                    if(formData.name != '' && formData.name !== adminStore.activeTeacherItem.name) {
+                    //编辑学生账号，发送三个请求
+                    if(formData.name != '' && formData.name !== adminStore.activeStudentItem.name) {
                         try {
                             const params = {
-                                userId: adminStore.activeTeacherItem.userId,
+                                userId: adminStore.activeStudentItem.userId,
                                 name: formData.name
                             }
                             await fetchUpdateUserName(params);
@@ -155,7 +156,7 @@ const submitForm = async (formEl: FormInstance | undefined) => {
                             ElMessage.error('修改名称失败！');
                         }
                     }
-                    if(formData.password != '' && formData.password !== adminStore.activeTeacherItem.password) {
+                    if(formData.password != '' && formData.password !== adminStore.activeStudentItem.password) {
                         try {
                             if(formData.password!==formData.password2) {
                                 ElMessage.error('两次输入的密码不一致');
@@ -163,7 +164,7 @@ const submitForm = async (formEl: FormInstance | undefined) => {
                             }else {
                                 const params = {
                                     account: formData.account,
-                                    oldPassword: adminStore.activeTeacherItem.password,
+                                    oldPassword: adminStore.activeStudentItem.password,
                                     newPassword: formData.password
                                 }
                                 await fetchUpdateUserPasswordByOld(params)
@@ -173,10 +174,10 @@ const submitForm = async (formEl: FormInstance | undefined) => {
                         }
                     }
                     const currentStatus = formData.isEnable === '启用' ? true : false;
-                    if(currentStatus !== adminStore.activeTeacherItem.isEnable) {
+                    if(currentStatus !== adminStore.activeStudentItem.isEnable) {
                         try {
                             const params = {
-                                userId: adminStore.activeTeacherItem.userId,
+                                userId: adminStore.activeStudentItem.userId,
                                 status: currentStatus
                             }
                             await fetchUpdateUserStatus(params);
@@ -186,7 +187,7 @@ const submitForm = async (formEl: FormInstance | undefined) => {
                     }
                     ElMessage.success('修改成功');
                     //信息修改成功，返回列表页面
-                    adminStore.setIsShowTeacherList(true);
+                    adminStore.setIsShowStudentList(true);
                 }
             } catch (error) {
                 ElMessage.error('注册失败');

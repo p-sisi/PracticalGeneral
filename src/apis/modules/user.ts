@@ -36,6 +36,12 @@ export function fetchAllTeacher() {
     return request.get('/user/getAllTch');
 }
 
+/**
+ * 获取所有学生账号---管理员端
+ */
+export function fetchAllStudent() {
+    return request.get('/user/getAllStu');
+}
 
 /**
  *  修改用户姓名--- 管理员端
