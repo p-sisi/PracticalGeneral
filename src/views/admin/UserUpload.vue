@@ -80,7 +80,6 @@
         <el-button type="success" @click="exportUserRequest(multipleSelectionData)">导入选中</el-button>
         <el-button type="danger" @click="deleteDialogVisible = true">删除选中</el-button>
         <el-button type="success" @click="exportUserRequest(analyzeListData)">全部导入</el-button>
-
     </div>
 
     <!-- 导入成功的数据 -->

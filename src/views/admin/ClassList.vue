@@ -38,26 +38,26 @@
             <div class="container-table-title">
                 <div class="text">课程列表</div>
                 <div class="new" @click="handleNewCourse()">
-                    <div>+&nbsp;添加课程</div>
+                    <div>+&nbsp;新建课程</div>
                 </div>
             </div>
 
             <!-- 课程列表表格 -->
             <el-table :data="tableList" height="450" stripe>
-                <el-table-column fixed prop="courseNumber" label="课号" width="100px" />
-                <el-table-column prop="courseName" label="名称" width="160" />
-                <el-table-column prop="teacherName" label="任教老师" width="110" />
-                <el-table-column prop="isOver" label="状态" width="100">
+                <el-table-column fixed prop="courseNumber" label="课号" width="100px" align="center"/>
+                <el-table-column prop="courseName" label="名称" width="160" align="center"/>
+                <el-table-column prop="teacherName" label="任教老师" width="110" align="center"/>
+                <el-table-column prop="isOver" label="状态" width="100" align="center">
                     <template #default="scope">
                         <span v-if="scope.row.isOver == true" class="isOver">已结束</span>
                         <span v-else class="isDoing">进行中</span>
                     </template>
                 </el-table-column>
-                <el-table-column prop="stuNum" label="学生人数" width="100" />
-                <el-table-column prop="createTime" label="创建时间" width="240" />
-                <el-table-column label="操作">
+                <el-table-column prop="stuNum" label="学生人数" width="100" align="center"/>
+                <el-table-column prop="createTime" label="创建时间" width="240" align="center"/>
+                <el-table-column label="操作" align="center">
                     <template #default="scope">
-                        <el-button size="small" @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
+                        <el-button size="small" @click="handleEdit(scope.row)">编辑</el-button>
                         <el-button size="small" type="danger" @click="handleDelete(scope.$index, scope.row)">删除</el-button>
                     </template>
                 </el-table-column>
@@ -109,23 +109,15 @@ const classStatus = ref();
 const inputUploader = ref('');
 const handleSearch = () => {
     const filteredList = tableListAll.value.filter((course: any) => {
-        // 判断时间范围是否符合搜索条件
         const createTime = new Date(course.createTime).getTime();
         const startDate = dateValue.value ? new Date(dateValue.value[0]).getTime() : 0;
         const endDate = dateValue.value ? new Date(dateValue.value[1]).getTime() : Number.MAX_SAFE_INTEGER;
         const timeInRange = createTime >= startDate && createTime <= endDate;
-
-        // 判断课程状态是否符合搜索条件
         const statusMatched = classStatus.value ? course.isOver === (classStatus.value === '已结束') : true;
-
-        // 判断任课教师是否符合搜索条件
         const teacherMatched = inputUploader.value ? course.teacherName.includes(inputUploader.value) : true;
 
-        // 返回符合所有条件的课程数据
         return timeInRange && statusMatched && teacherMatched;
     });
-
-    // 更新表格数据显示筛选后的课程列表
     tableList.value = filteredList;
 }
 const handleReset = () => {
@@ -136,23 +128,28 @@ const handleReset = () => {
     ElMessage.success('重置成功')
 }
 
-//点击新建课程
+//新建课程
 const handleNewCourse = () => {
+    //不展示课程列表，而是展示编辑新建区
     adminStore.setIsShowCourseList(false);
-    adminStore.setIsEdit(false);
+
+    //设置状态为新建
+    adminStore.setIsEditClass(false);
 }
 
-//表格操作
-const handleEdit = (index: number, row: any) => {
+//编辑课程
+const handleEdit = (row: any) => {
+    //不展示课程列表，而是展示编辑新建区
     adminStore.setIsShowCourseList(false);
-    //保存当前点击的课程item信息
+
+    //设置状态为“编辑”，并保存当前选中的课程信息
     adminStore.setActiveCourseItem(row);
-    adminStore.setIsEdit(true)
+    adminStore.setIsEditClass(true)
 }
 
 const handleDelete = (index: number, row: any) => {
     //TODO:执行删除课程请求操作，出现确认弹窗
-  console.log(index, row)
+    console.log(index, row)
 }
 </script>
 

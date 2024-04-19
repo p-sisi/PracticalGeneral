@@ -24,6 +24,34 @@ export function fetchGetAllCourseAdmin() {
 }
 
 /**
+ * 管理员端---新建课程（不包括导入学生）
+ */
+export function fetchNewCourse(params: any) {
+    return request.post('/course/newOne',params);
+}
+
+/**
+ * 管理员端---编辑课程信息课程（不包括导入学生信息）
+ */
+export function fetchEditCourse(params: any) {
+    return request.post('/course/updateCourseInfo',params);
+}
+
+/**
+ * 管理员端---批量导入学生信息至课堂
+ */
+export function fetchUploadStudentToCourse(params: any,courseId: number) {
+    return request.post(`/course/insertAllStu?courseId=${courseId}`,params);
+}
+
+/**
+ * 管理员端---批量注册学生信息并直接导入课堂
+ */
+export function fetchCreateAndUploadStudentToCourse(params: any,courseId: number) {
+    return request.post(`/course/newStuAndInsert?courseId=${courseId}`,params);
+}
+
+/**
  * 加课码加入课程
  * @params addCode: 加课码
  */
