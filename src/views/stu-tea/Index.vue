@@ -37,7 +37,7 @@
                         <div>加入课程</div>
                     </div>
                     <div class="header-right-user">
-                        <el-avatar :icon="UserFilled" size="small" :src="`${BASE_ERL}/file/images/${commonStore.userInfo.headImg}`"> </el-avatar>
+                        <el-avatar :icon="UserFilled" size="small" :src="`${BASE_ERL}/file/images/${commonStore.userInfo.headImg}`" @click="handleUserCenter"> </el-avatar>
                         <div v-if="commonStore.userType == '学生'">学生：{{ commonStore.userInfo.name }}</div>
                         <div v-else>教师：{{ commonStore.userInfo.name }}</div>
                         <el-dropdown>
