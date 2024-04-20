@@ -11,18 +11,22 @@
                     > {{item}}</div>
             </div>
 
-            <div class="login-email" v-if="isLoginByAccount" @click="isLoginByAccount = false">邮箱登录 ></div>
-            <div class="login-account" v-else @click="isLoginByAccount = true">< 账号登录</div>
+            <div class="login-email" v-if="isLoginByAccount && currentStatus == '登录'" @click="isLoginByAccount = false">邮箱登录 ></div>
+            <div class="login-account" v-if="!isLoginByAccount && currentStatus == '登录'" @click="isLoginByAccount = true">< 账号登录</div>
             <!-- 登录输入框 -->
             <div class="login-input-login" v-show="currentStatus == '登录'">
                 <div>
                     <span class="iconfont icon-yonghu"></span>
-                    <el-input v-model="userCount" style="width: 300px" placeholder="请输入用户账号" clearable maxlength="11" ref="inputCount"/>
+                    <el-input v-if="isLoginByAccount && currentStatus == '登录'" v-model="userCount" style="width: 300px" placeholder="请输入用户账号" clearable maxlength="11" ref="inputCount"/>
+                    <el-input v-else v-model="userEmail" style="width: 300px" placeholder="请输入邮箱号" clearable ref="inputEmail"/>
                 </div>
                 <div class="divide"></div>
-                <div style="margin-top: 28px;">
-                    <span class="iconfont icon-mima"></span>
-                    <el-input v-model="userPassword" style="width: 300px" placeholder="请输入密码" clearable type="password" show-password maxlength="12" ref="inputPassword"/>
+                <div style="position: relative;margin-top: 28px;">
+                    <span class="iconfont icon-mima" v-if="!isLoginByAccount && currentStatus == '登录'"></span>
+                    <span class="iconfont icon-verify" v-else></span>
+                    <el-input v-if="isLoginByAccount && currentStatus == '登录'" v-model="userPassword" style="width: 300px" placeholder="请输入密码" clearable type="password" show-password maxlength="12" ref="inputPassword"/>
+                    <el-input v-else v-model="userVerifyCode" style="width: 300px" placeholder="请输入验证码" maxlength="6" />
+                    <span class="login-verify" v-if="!isLoginByAccount &&currentStatus == '登录'" @click="handleSendVerifyCode" :disabled="isSendingCode">{{ isSendingCode ? `（${sendingTime}秒）` :'发送验证码'}}</span>
                 </div>
                 <div class="divide"></div>
             </div>
@@ -30,6 +34,10 @@
             
             <!-- 注册输入框 -->
             <div class="login-input-sign" v-show="currentStatus == '注册'">
+                <div style="margin-top: 28px;">
+                    <span class="iconfont icon-yonghu"></span>
+                    <el-input v-model="signName" style="width: 300px" placeholder="请输入用户名" clearable maxlength="5" ref="inputNameRef"/>
+                </div>
                 <div style="margin-top: 28px;">
                     <span class="iconfont icon-yonghu"></span>
                     <el-input v-model="signCount" style="width: 300px" placeholder="请输入用户账号" clearable maxlength="11" ref="inputCountRef"/>
@@ -66,7 +74,7 @@ import lottie from 'lottie-web'
 import people from '../assets/iconfont/login.json'
 import { ElMessage } from 'element-plus';
 import { Loading } from '@element-plus/icons-vue';
-import { fetchLoginIn } from '../apis/modules/user';
+import { fetchLoginIn, fetchSendEmailCode, fetchLoginInByEmail, fetchSignUp } from '../apis/modules/user';
 import { useCommonStore } from '@/store';
 import router from '../router';
 
@@ -99,11 +107,15 @@ const inputCount = ref(null);
 const inputPassword = ref(null);
 const isLogin = ref(false);
 
+const userVerifyCode = ref('');     //邮箱登录验证码
+const userEmail = ref('');          //用户输入的邮箱号
+
 /**
  * 1、发送登录请求
  * 2、保存用户信息
  * 3、保存身份验证token
  * 4、路由跳转对应端
+ * 5、区分账号登录和邮箱登录
  */
 const handleLoginIn  = async () => {
     if(userCount.value === '' || userPassword.value === '') {
@@ -119,19 +131,33 @@ const handleLoginIn  = async () => {
     }
     try {
         isLogin.value = true;
-
-        const params = {
-            account: userCount.value,
-            password: userPassword.value
+        let result;
+        if(isLoginByAccount.value = true) {
+            const params = {
+                account: userCount.value,
+                password: userPassword.value
+            }
+            result = await fetchLoginIn(params);
+        }else {
+            const params = {
+                email: userEmail.value,
+                code: userVerifyCode.value
+            }
+            result = await fetchLoginInByEmail(params);
         }
-        const result = await fetchLoginIn(params);
-        commonStore.setUserType(result.data.userInfo.userType);
-        commonStore.setUserInfo(result.data.userInfo);
-        localStorage.setItem('Token', result.data.token);
 
+        //保存用户信息
+        commonStore.setUserType(result?.data.userInfo.userType);
+        commonStore.setUserInfo(result?.data.userInfo);
+        localStorage.setItem('Token', result?.data.token);
 
         isLogin.value = false;
         ElMessage.success('登录成功！');
+        
+        // 登录成功后，倒计时60秒后跳转
+        sendingTime.value = 60;
+        clearInterval(intervalId.value);
+
         if(commonStore.userType == '管理员') {
             router.push({name:'admin-class'});
         }else if(commonStore.userType == '教师') {
@@ -146,14 +172,16 @@ const handleLoginIn  = async () => {
 }
 
 //注册
+const signName = ref('');
 const signCount = ref('');
 const signPassword1 = ref('');
 const signPassword2 = ref('');
+const inputNameRef = ref(null);
 const inputCountRef = ref(null);
 const inputPasswordRef1 = ref(null);
 const inputPasswordRef2 = ref(null);
-const handleSignUp = () => {
-    if(signCount.value === '' || signPassword1.value === '' || signPassword2.value === '') {
+const handleSignUp = async() => {
+    if(signCount.value === '' || signPassword1.value === '' || signPassword2.value === '' ) {
         if(signCount.value === '' ) {
             ElMessage.error('用户账号不能为空！');
             inputCountRef.value.focus();
@@ -164,6 +192,12 @@ const handleSignUp = () => {
             ElMessage.error('请输入确认密码！');
             inputPasswordRef2.value.focus();
         }
+        return
+    }
+    if(signName.value.length < 2 || signName.value.length > 5) {
+        ElMessage.error('用户名长度为2-5个字符！');
+        inputNameRef.value.focus();
+        return
     }
     if(signPassword1.value !== signPassword2.value) {
         ElMessage.error('两次输入的密码不一致！');
@@ -171,11 +205,62 @@ const handleSignUp = () => {
         return;
     }
     //注册逻辑
+    try {
+        const params = {
+            account: signCount.value,
+            password: signPassword1.value,
+            name: signName.value,
+            userType: 2
+        }
+        await fetchSignUp(params);
+
+        ElMessage.success('注册成功！');
+        currentStatus.value = '登录';
+        userCount.value = signCount.value;
+        signCount.value = '';
+        signPassword1.value = '';
+        signPassword2.value = '';
+        signName.value = '';
+    } catch (error: any) {
+        ElMessage.error(error.message);
+    }
 }
 
 //忘记密码
 const ForgetPassword = () => {
     
+}
+
+const isSendingCode = ref(false);       //是否正在发送验证码
+const sendingTime = ref(60);          //发送验证码倒计时
+const intervalId = ref();          //发送验证码倒计时定时器
+
+//发送验证码
+const handleSendVerifyCode = async () => {
+    var pattern = /^[\w\.-]+@[\w\.-]+\.\w+$/;
+    if (!pattern.test(userEmail.value)) {
+        return ElMessage.error("请输入正确的邮箱地址");
+    }
+    isSendingCode.value = true;
+    intervalId.value = setInterval(() => {
+        sendingTime.value--;
+        if(sendingTime.value <= 0) {
+            clearInterval(intervalId.value);
+            isSendingCode.value = false;
+        }
+    }, 1000); 
+
+    try {
+        const params = {
+            email: userEmail.value
+        }
+        await fetchSendEmailCode(params);
+        ElMessage.success('验证码发送成功')
+    } catch (error: any) {
+        ElMessage.error(error.message)
+        clearInterval(intervalId.value);
+        isSendingCode.value = false;
+    }
 }
 </script>
 
@@ -195,7 +280,7 @@ $primary-color: #4186ff;
         width: 28%;
     }
     .login {
-        margin-top: 100px;
+        margin-top: 80px;
         margin-left: 300px;
         width: 32%;
         height: 64%;
@@ -217,10 +302,17 @@ $primary-color: #4186ff;
                 border-radius: 2px;
             }
         }
-        .login-email {
+        .login-email{
             display: flex;
             margin-top: 10px;
             justify-content: flex-end;
+            font-size: 14px;
+            cursor: pointer;
+        }
+        .login-account {
+            display: flex;
+            margin-top: 10px;
+            justify-content: flex-start;
             font-size: 14px;
             cursor: pointer;
         }
@@ -237,6 +329,14 @@ $primary-color: #4186ff;
                 height: 1px;
                 width: 82%;
                 background-color: #ccc;
+            }
+            .login-verify {
+                position: absolute;
+                margin-left: -110px;
+                margin-top: 6px;
+                color: #4186ff;
+                font-size: 12px;
+                cursor: pointer;
             }
         }
         &-input-sign {
@@ -264,7 +364,7 @@ $primary-color: #4186ff;
             margin-top: 4px;
         }
         &-forget {
-            float: right;
+            float: left;
             margin: 8px 80px;
             font-size: 12px;
             color: $primary-color;

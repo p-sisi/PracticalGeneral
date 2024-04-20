@@ -2,10 +2,17 @@ import request from '../request';
 
 
 /**
- * 用户登录
+ * 用户登录--通过账号
  */
 export function fetchLoginIn(params: any) {
     return request.post('/user/login', params);
+}
+
+/**
+ * 用户登录--通过邮箱和验证码
+ */
+export function fetchLoginInByEmail(params: any) {
+    return request.get('/user/loginByEmail', params);
 }
 
 /**
@@ -62,4 +69,11 @@ export function fetchUpdateUserPasswordByOld(params: any) {
  */
 export function fetchUpdateUserStatus(params: any) {
     return request.get('/user/setUserStatus',params);
+}
+
+/**
+ *  发送验证码
+ */
+export function fetchSendEmailCode(params: any) {
+    return request.get('/user/sendEmailCode',params);
 }
