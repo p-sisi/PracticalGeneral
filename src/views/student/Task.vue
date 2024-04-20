@@ -152,10 +152,11 @@ import { computed, ref, onMounted, Ref } from 'vue';
 import { ElMessage, genFileId } from 'element-plus'
 import { Clock, Folder } from '@element-plus/icons-vue';
 import type { UploadInstance, UploadProps, UploadRawFile } from 'element-plus'
-import { fetchGetAllCourseTask, fetchGetTaskHistory, fetchDownloadTask } from '../../apis/modules/task';
+import { fetchGetAllCourseTask, fetchGetTaskHistory } from '../../apis/modules/task';
 import { useCommonStore } from '@/store';
 import { Task, TaskDetail } from '../../content/task';
 import axios from 'axios';
+import { BASE_ERL } from '../../content/common'
 
 onMounted(() => {
     getTaskDataRequest();
@@ -261,27 +262,28 @@ const handleSubmitTask = async () => {
         });
 }
 
+//下载历史提交作业
 const handleDownLoad = async (item: any) => {
     try {
         const params = {
             fileName: item.depositFilename
         };
-        const result = await fetchDownloadTask(params);
+        axios.get(`http://localhost:1023/file/homeworkFiles/download/${item.depositFilename}`, config)
+            .then((response: any) => {
+                const blob = new Blob([response.data]);
+                const url = window.URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                link.href = url;
+                link.setAttribute('download', item.depositFilename); // 在这里设置文件名
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                ElMessage.success('下载成功');
+            })
+            .catch((error: any) => {
+                console.error('Error:', error);
+            });
 
-        // // 由于Axios拦截器已经处理了Blob类型的响应，直接使用Blob URL来创建下载链接
-        // const url = window.URL.createObjectURL(result);
-
-        // // 创建a标签并设置下载属性
-        // const link = document.createElement('a');
-        // link.href = url;
-        // link.setAttribute('download', 'filename.extension'); // 设置下载的文件名及扩展名
-
-        // // 将a标签添加到页面并模拟点击下载
-        // document.body.appendChild(link);
-        // link.click();
-
-        // // 释放Blob URL资源
-        // window.URL.revokeObjectURL(url);
     } catch (error) {
         console.error('Error:', error);
     }

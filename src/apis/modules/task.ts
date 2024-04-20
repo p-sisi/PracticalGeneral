@@ -31,13 +31,6 @@ export function fetchGetTaskHistory(params: any) {
 }
 
 /**
- * 下载作业
- */
-export function fetchDownloadTask(params: any) {
-    return request.get('/file/download',params);
-}
-
-/**
  * 教师端--获取某个作业的学生提交数据
  */
 export function fetchTaskSubmitList(params: any) {
