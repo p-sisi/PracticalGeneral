@@ -8,9 +8,11 @@ export interface userInfo {
     name: string;     //姓名
     userId: number;  //用户id
     userType: number;  //用户类型
+    email: any;        //绑定邮箱
+    phone: any;        //绑定手机号
 }
 export interface CommonState{
-    userType: string;   //用户类型    教师，学生，管理员
+    userType: any;   //用户类型    教师，学生，管理员
     userInfo: object;   //用户信息
     activeHeaderMenu: string;   //当前激活的头部菜单
     headerMenu: string[];   //头部菜单
@@ -35,6 +37,12 @@ export const useCommonStore = defineStore("common",{
         },
         setUserInfo(info: object) {
             this.userInfo = info;
+        },
+        updateUserName(val: string) {
+            this.userInfo.name = val;
+        },
+        updateUserEmail(email: string) {
+            this.userInfo.email = email;
         },
         setActiveHeaderMenu(menu: string) {
             this.activeHeaderMenu = menu;

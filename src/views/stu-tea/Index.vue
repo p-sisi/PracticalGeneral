@@ -47,7 +47,7 @@
                             <template #dropdown>
                                 <el-dropdown-menu>
                                     <el-dropdown-item @click="handleClickMyClass">我的课程</el-dropdown-item>
-                                    <el-dropdown-item @click="handleChangePassword">修改密码</el-dropdown-item>
+                                    <el-dropdown-item @click="handleUserCenter">个人中心</el-dropdown-item>
                                     <el-dropdown-item divided @click="handleLoginOut">退出登录</el-dropdown-item>
                                 </el-dropdown-menu>
                             </template>
@@ -182,9 +182,9 @@ const handleClickMyClass = () => {
     commonStore.setActiveHeaderMenu('首页')
 }
 
-//修改密码
-const handleChangePassword = () => {
-    //TODO:修改密码请求
+//切换至个人中心
+const handleUserCenter = () => {
+    router.push({name: 'user_center'})
 }
 
 //退出登录

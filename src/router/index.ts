@@ -37,6 +37,8 @@ import TeacherCheck from '../views/teacher/CheckIn.vue'
 import TeacherReply from '../views/teacher/Reply.vue'
 import TeacherMember from '../views/teacher/Member.vue'
 
+import UserCenter from '../views/UserCenter.vue'
+
 
 
 const routes = [
@@ -88,6 +90,11 @@ const routes = [
               path: 'home',
               name: 'student_home',
               component: IndexBody,
+            },
+            {
+                name: 'user_center',
+                path: '/user',
+                component:UserCenter,
             },
             {
                 // 学生端--课程详情页路由

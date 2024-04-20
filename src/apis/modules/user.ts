@@ -51,7 +51,7 @@ export function fetchAllStudent() {
 }
 
 /**
- *  修改用户姓名--- 管理员端
+ *  修改用户姓名
  */
 export function fetchUpdateUserName(params: any) {
     return request.get('/user/updateName',params);
@@ -62,6 +62,13 @@ export function fetchUpdateUserName(params: any) {
  */
 export function fetchUpdateUserPasswordByOld(params: any) {
     return request.post('/user/resetPwdByOldPwd',params);
+}
+
+/**
+ *  修改密码(通过邮箱)
+ */
+export function fetchUpdateUserPasswordByEmail(params: any) {
+    return request.post('/user/resetPwdByEmail',params);
 }
 
 /**
@@ -76,4 +83,18 @@ export function fetchUpdateUserStatus(params: any) {
  */
 export function fetchSendEmailCode(params: any) {
     return request.get('/user/sendEmailCode',params);
+}
+
+/**
+ *  绑定邮箱
+ */
+export function fetchBindEmail(params: any) {
+    return request.get('/user/bindingEmail',params);
+}
+
+/**
+ *  判断邮箱是否已经被绑定
+ */
+export function fetchHasBindEmail(params: any) {
+    return request.get('/user/emailIsUsed',params);
 }
