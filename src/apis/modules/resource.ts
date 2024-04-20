@@ -17,6 +17,14 @@ export function fetchVideoResourceTech(params: any) {
 }
 
 /**
+ * 获取课程的所有文件资源
+ */
+export function fetchFileResource(params: any) {
+    return request.get('/courseFile/getAllFile',params);
+}
+
+
+/**
  * 上传视频资源
  */
 export function fetchUploadVideoResource(params: any) {
@@ -28,6 +36,13 @@ export function fetchUploadVideoResource(params: any) {
  */
 export function fetchDeleteVideoResource(params: any) {
     return request.get('/video/deleteVideo',params);
+}
+
+/**
+ * 删除文件资源
+ */
+export function fetchDeleteFileResource(params: any) {
+    return request.get('/courseFile/deleteFile',params);
 }
 
 /**

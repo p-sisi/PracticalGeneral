@@ -13,7 +13,7 @@ export default defineConfig(() => {
       port: 1023,
       open: true,
       proxy: {
-          '^(/user|/notice|/course|/homework|/file|/discussion|/sign|/video|/score|/defence|/log)': {
+          '^(/user|/notice|/course|/homework|/file|/discussion|/sign|/video|/score|/defence|/log|/courseFile)': {
               target: BASE_ERL,    //请求域名
               changeOrigin: true,
           }

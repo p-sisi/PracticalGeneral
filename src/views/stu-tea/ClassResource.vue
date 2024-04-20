@@ -173,21 +173,83 @@
         </div>
 
         <!-- 文档资源 -->
-        <!-- ！！！！TODO：未开发 -->
         <div class="resource-file">
             <div class="resource-file-title">
                 <div>
                     <span class="iconfont icon-file"></span>
                     <span>文档</span>
                 </div>
-                <el-button v-if="commonStore.userType == '教师'" type="success" :icon="Plus">上传文档</el-button>
+                <el-button v-if="commonStore.userType == '教师' && isShowUploadFile == false" type="success" :icon="Plus" @click="isShowUploadFile = true">上传文档</el-button>
             </div>
+
             <div class="divide"></div>
-            <div class="resource-file-list" v-if="fileResourceList.length !== 0">
-                文档资源列表
+
+            <!-- 上传文件的编辑区-->
+            <div class="resource-file-upload" v-if="isShowUploadFile == true">
+                <div class="upload-title">上传文档</div>
+                <div class="upload-form">
+                    <div class="upload-form-file">
+                        <div style="margin-top: 6px;">文档资源：</div>
+                        <div style="display: flex;flex-flow:column nowrap;gap: 10px">
+                            <el-upload
+                                ref="uploadRef"
+                                :auto-upload="false"
+                                :show-file-list="false"
+                                @change="handleChangeFileResource"
+                                :limit="1"
+                                :on-exceed="handleExceed"
+                                >
+                                <el-button type="primary">选择文件</el-button>
+                            </el-upload>
+                            <span v-if="isSelectedFile == true" class="file-info">
+                                <span class="iconfont icon-wendangwenjian"></span>
+                                <div class="file-info-content">
+                                    <span class="title">{{ selectedFileFile.name }}</span>
+                                    <span class="size">{{ ((selectedFileFile.size/1024)/1024).toFixed(2) }}MB</span>
+                                </div>
+                            </span>
+                        </div>
+                    </div>
+                    <div style="margin-left: 30px;">
+                        <span>文档标题：</span>
+                        <el-input v-model="inputFileTitle" style="width: 240px" placeholder="请输入文档标题" />
+                    </div>
+                </div>
+                <div class="upload-btn">
+                    <el-button @click="isShowUploadFile = false">取消</el-button>
+                    <el-button type="success" :icon="Plus" @click="handleUploadFile()" :disabled="isUploadingFile == true">{{ isUploadingFile == true ? '正在上传中':'上传' }}</el-button>
+                </div>
             </div>
-            <!-- 没有视频资源列表的空状态 -->
-            <div class="resource-file-empty">
+
+            <!-- 文件资源列表 -->
+            <div class="resource-file-list" v-if="fileResourceList.length !== 0">
+                <div v-for="item in fileResourceList" :key="item.id" class="resource-file-list-item">
+                    <div class="item-left">
+                        <span class="iconfont icon-wendang-xuanzhong"></span>
+                        <div class="item-left-info">
+                            <span class="title">{{ item.title }}</span>
+                            <span class="size">大小：{{ item.fileSize/1024/1024 > 1 ? (item.fileSize/1024/1024).toFixed(2) + 'M' : (item.fileSize/1024).toFixed(2) + 'K'}}</span>
+                        </div>
+                    </div>
+                    <div class="item-right">
+                        <span class="downLoad" @click="handleDownLoad(item)">下载</span>
+                        <el-popconfirm
+                            width="220"
+                            confirm-button-text="确定"
+                            cancel-button-text="取消"
+                            icon-color="#f56c6c"
+                            title="确定删除该视频文档资源?"
+                            @confirm="handleDeleteRequest(item.id)"
+                        >
+                            <template #reference>
+                                <span class="delete">删除</span>
+                            </template>
+                        </el-popconfirm>
+                    </div>
+                </div>
+            </div>
+            <!-- 没有文件资源列表的空状态 -->
+            <div class="resource-file-empty" v-else>
                 <img src="../../assets/images/no-message.png" alt="">
                 <span>暂无文档资源</span>
             </div>
@@ -269,16 +331,19 @@ import {
     fetchDeleteVideoResource, 
     fetchUpdateVideoResource , 
     fetchVideoResource, 
+    fetchFileResource,
     fetchPlayVideoResource, 
     fetchPauseVideoResource, 
-    fetchVideoResourcePlayWatch} from '../../apis/modules/resource'
+    fetchVideoResourcePlayWatch,
+    fetchDeleteFileResource} from '../../apis/modules/resource'
 import { TEACHER_VIDEO_LIST, BASE_ERL } from '../../content/common'
 import { getStringTime, formatTime, formatTimeString } from '../../util/index'
 import { useCommonStore } from '@/store'
 import axios from 'axios';
 
 onMounted(() => {
-    getVideoResourceRequest()
+    getVideoResourceRequest();
+    getFileAllResource();
 })
 
 const commonStore = useCommonStore();   
@@ -424,7 +489,6 @@ const handleClickEdit = (item: any) => {
 
 const isPlay = ref(false);      //播放视频大屏 or 视频资源列表
 const isPlayingVideo = ref(false);     //是否正在播放视频
-let isManualSeek = false;           // 是否手动拖动进度条的标志
 
 const isCollapse = ref(false);     // 是否折叠菜单
 const activeMenuIndex = ref('');     // 当前激活的菜单项索引
@@ -589,7 +653,111 @@ const editVideoRequest = async () => {
         ElMessage.error('更新失败')
     }
 }
+
 const fileResourceList = ref([]);   //文档资源列表
+
+/**
+ *  获取全部文件资源
+ */
+const getFileAllResource = async () => {
+    try {
+        const params = {
+            courseId: commonStore.activeClass.courseId
+        }
+        const res = await fetchFileResource(params);
+        fileResourceList.value = res.data;
+        console.log('文件资源列表', fileResourceList.value)
+    } catch (error) {
+        ElMessage.error('获取文件资源失败')
+    }
+}
+
+/**
+ *    下载文件资源
+ */
+const handleDownLoad = async (item: any) => {
+    try {
+        axios.get(`http://localhost:1023/file/courseFiles/download/${item.depositFilename}`, config)
+            .then((response: any) => {
+                const blob = new Blob([response.data]);
+                const url = window.URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                link.href = url;
+                link.setAttribute('download', item.depositFilename); // 在这里设置文件名
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                ElMessage.success('下载成功');
+            })
+            .catch((error: any) => {
+                console.error('Error:', error);
+            });
+
+    } catch (error) {
+        console.error('Error:', error);
+    }
+};
+
+/**
+ *  删除文件资源请求
+ */
+const handleDeleteRequest = async (id: number) => {
+    try {
+        await fetchDeleteFileResource({
+            fileId: id
+        })
+        ElMessage.success('删除成功')
+        getFileAllResource();
+    } catch (error: any) {
+        ElMessage.error(error.message)
+    }
+}
+
+const isShowUploadFile = ref(false);        //是否展示上传文档资源编辑区
+
+const isSelectedFile = ref(false);      //是否选中文件资源
+const selectedFileFile = ref(null);         //选中的文件资源文件
+const inputFileTitle = ref('');         //输入的文档标题
+
+const isUploadingFile = ref(false);     //是否正在上传文件
+
+//用户选择视频资源行为
+const handleChangeFileResource = (video: any) => {
+    isSelectedFile.value = true;
+    selectedFileFile.value = video.raw;
+    console.log(selectedFileFile.value);
+};
+
+/**
+ *  发送文件上传请求
+ */
+const handleUploadFile = async () => {
+    if(inputFileTitle.value == '') {
+        return ElMessage.error('请输入文档标题')
+    }
+    if(!selectedFileFile.value) {
+        return ElMessage.error('请选择文档资源')
+    }
+    if(isUploadingFile.value) {
+        return ElMessage.error('正在上传中，请稍等')
+    }
+    isUploadingFile.value = true;
+    let formData = new FormData();
+    formData.append('file', selectedFileFile.value);
+    formData.append('courseId', commonStore.activeClass.courseId);
+    formData.append('title', inputFileTitle.value);
+
+    axios.post('http://localhost:1023/courseFile/commitFile', formData, config)
+        .then((response: any) => {
+            ElMessage.success('上传成功')
+            //重新获取视频资源
+            isUploadingFile.value = false;
+            getFileAllResource()
+        })
+        .catch((error: any) => {
+            console.error('Error:', error);
+        });
+}
 
 </script>
 
@@ -761,8 +929,8 @@ const fileResourceList = ref([]);   //文档资源列表
         }
     }
 
-    &-file {
-        &-title {
+    .resource-file {
+        .resource-file-title {
             display: flex;
             margin-right: 10px;
             justify-content: space-between;
@@ -771,6 +939,106 @@ const fileResourceList = ref([]);   //文档资源列表
                 font-size: 18px;
                 margin-right: 5px;
                 color: #4186ff;
+            }
+        }
+        .resource-file-upload {
+            padding: 10px;
+            background-color: #f8fbff;
+            border-radius: 4px;
+            .upload-title {
+                font-weight: 600;
+                font-size: 14px;
+            }
+            .upload-form {
+                display: flex;
+                flex-flow: column nowrap;
+                gap: 10px;
+                padding: 8px 20%;
+                margin-bottom: 10px;
+                background-color: #fff;
+                border-radius: 4px;
+                .upload-form-file {
+                    margin-left: 30px;
+                    display: flex;
+                    .file-info {
+                        display: flex;
+                        align-items: center;
+                        gap: 10px;
+                        border: 1px solid #cccccc8d;
+                        border-radius: 4px;
+                        padding: 4px 10px;
+                        .iconfont {
+                            color: #409eff;
+                            font-size: 26px;
+                        }
+                        .file-info-content {
+                            display: flex;
+                            flex-flow: column nowrap;
+                            justify-content: center;
+                            .title {
+                                font-size: 14px;
+                            }
+                            .size {
+                                font-size: 12px;
+                                color: #999;
+                            }
+                        }
+                    }
+                }
+            }
+            .upload-btn {
+                display: flex;
+                margin-bottom: 10px;
+                justify-content: flex-end;
+            }
+        }
+        .resource-file-list {
+            margin-top: 10px;
+            margin-left: 20px;
+            margin-right: 30px;
+            margin-bottom: 40px;
+            display: flex;
+            flex-flow: column nowrap;
+            gap: 20px;
+            .resource-file-list-item {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding: 20px 30px;
+                border: 1px solid #cccccc8d;
+                border-radius: 4px;
+                transition: all 0.3s;
+                .item-left {
+                    display: flex;
+                    gap: 20px;
+                    .iconfont {
+                        font-size: 30px;
+                        color: #4186ff;
+                    }
+                    .item-left-info {
+                        display: flex;
+                        flex-flow: column nowrap;
+                        gap: 4px;
+                        .title {
+                            font-size: 14px;
+                        }
+                        .size {
+                            font-size: 12px;
+                            color: #999;
+                        }
+                    }
+                }
+                .item-right {
+                    font-size: 14px;
+                    cursor: pointer;
+                    .downLoad,.delete {
+                        color: #409eff;
+                        margin-right: 20px;
+                    }
+                }
+            }
+            .resource-file-list-item:hover {
+                box-shadow: 0px 0px 3px rgba($color: #000000, $alpha: 0.2);
             }
         }
     }
